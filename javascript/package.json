@@ -1,0 +1,15 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "description": "### Creating Token to access Mapbox APIs * creating account with Mapbox * go to signup/login link https://account.mapbox.com/auth/signin/ * after creating a dev account you should see your token on https://account.mapbox.com/",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.88.2"
+  }
+}
