@@ -27,12 +27,12 @@ The response includes *overview_polyline* which is an approximate (smoothed) pat
 We stitch the exact polyline for the whole route by piecing together polyline from each step using the code below.
 
 ```python
-import polyline as Poly
+import polyline as poly
 segments=response['routes'][0]['legs'][0]['steps']
 coordinate_list=[]
 for i in segments:
-    coordinate_list.extend(Poly.decode(i['polyline']['points']))
-polyline_from_google=Poly.encode(coordinate_list)
+    coordinate_list.extend(poly.decode(i['polyline']['points']))
+polyline_from_google=poly.encode(coordinate_list)
 ```
 
 ```python
@@ -40,7 +40,7 @@ polyline_from_google=Poly.encode(coordinate_list)
 import json
 import requests
 import os 
-import polyline as Poly
+import polyline as poly
 
 
 '''Fetching Polyline from Google'''
@@ -63,8 +63,8 @@ response=requests.get(url).json()
 segments=response['routes'][0]['legs'][0]['steps']
 coordinate_list=[]
 for i in segments:
-    coordinate_list.extend(Poly.decode(i['polyline']['points']))
-polyline_from_google=Poly.encode(coordinate_list)
+    coordinate_list.extend(poly.decode(i['polyline']['points']))
+polyline_from_google=poly.encode(coordinate_list)
 
 ```
 
@@ -112,7 +112,7 @@ response_tollguru= requests.post(Tolls_URL, json=params, headers=headers).json()
 if str(response_tollguru).find('message')==-1:
     print('\n The Rates Are ')
     #extracting rates from Tollguru response is no error
-    print(*response_tollguru['summary']['rates'].items(),end="\n\n")
+    print(*response_tollguru['route']['costs'].items(),end="\n\n")
 else:
     raise Exception(response_tollguru['message'])
 ```
