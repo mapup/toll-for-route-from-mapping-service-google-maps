@@ -27,14 +27,14 @@ The response includes *overview_polyline* which is an approximate (smoothed) pat
 We stitch the exact polyline for the whole route by piecing together polyline from each step using the code below.
 
 ```php
+
 //extracting polyline from the JSON response..
 $data_gmaps = json_decode($response, true);
-$data_new = $data_gmaps['routes'];
-$new_data = $data_new['0'];
-$pol_data = $new_data['overview_polyline'];
 
 //polyline..
-$polyline_gmaps = $pol_data['points'];
+$polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
+
+
 ```
 
 ```php
@@ -70,12 +70,9 @@ if ($err) {
 
 //extracting polyline from the JSON response..
 $data_gmaps = json_decode($response, true);
-$data_new = $data_gmaps['routes'];
-$new_data = $data_new['0'];
-$pol_data = $new_data['overview_polyline'];
 
 //polyline..
-$polyline_gmaps = $pol_data['points'];
+$polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
 
 ```
 
@@ -139,9 +136,8 @@ if ($err) {
 }
 
 //response from tollguru..
-var_dump(json_decode($response, true));
-// $data = var_dump(json_decode($response, true));
-//print_r($data);
+$data = var_dump(json_decode($response, true));
+print_r($data);
 
 ```
 

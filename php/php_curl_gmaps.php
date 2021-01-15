@@ -31,12 +31,9 @@ if ($err) {
 
 //extracting polyline from the JSON response..
 $data_gmaps = json_decode($response, true);
-$data_new = $data_gmaps['routes'];
-$new_data = $data_new['0'];
-$pol_data = $new_data['overview_polyline'];
 
 //polyline..
-$polyline_gmaps = $pol_data['points'];
+$polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
 
 
 //using tollguru API..
@@ -47,7 +44,7 @@ curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
 
 $postdata = array(
-	"source" => "google",
+	"source" => "gmaps",
 	"polyline" => $polyline_gmaps
 );
 
@@ -83,7 +80,6 @@ if ($err) {
 }
 
 //response from tollguru..
-var_dump(json_decode($response, true));
-// $data = var_dump(json_decode($response, true));
-//print_r($data);
+$data = var_dump(json_decode($response, true));
+print_r($data);
 ?>
