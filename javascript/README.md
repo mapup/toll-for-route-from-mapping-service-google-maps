@@ -1,58 +1,79 @@
-# [Mapbox](https://www.mapbox.com/)
+# [Google Maps](https://cloud.google.com/maps-platform/?hl=en)
 
-### Get token to access Mapbox APIs (if you have an API token skip this)
-#### Step 1: Login/Signup
-* Create an accont to access [Mapbox Account Dashboard](https://account.mapbox.com/)
-* go to signup/login link https://account.mapbox.com/auth/signin/
+### Get key to access Google Maps APIs (if you have an API key skip this)
+#### Step 1: Get API Key
+* Create an account to access [Google Developer API Dashboard](https://console.cloud.google.com/apis/dashboard)
+* go to signup/login link https://cloud.google.com/maps-platform/?hl=en
+* you may need to add Billing Account. In that case make sure you select
+  Currency as USD. 
+* you will need to agree to Google's Terms of Service https://developers.google.com/terms
 
-#### Step 2: Creating a token
-* You will be presented with a default token.
-* If you want you can create an application specific token.
+#### Step 2: Create project
+* Login to your google api dashboard
+* Click on Credentials and Create Credentials ( Create Credentials > Api key ) for the above API
+* [Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key)
 
+#### Step 3: Enable API
+* Go to [Google API Library](https://console.cloud.google.com/apis/library) and 
+* active at least Google Maps API 
+* If you prefer you can enable Places API and Geocoding API
 
-To get the route polyline make a GET request on https://api.mapbox.com/directions/v5/mapbox/driving/${source.longitude},${source.latitude};${destination.longitude},${destination.latitude}?geometries=polyline&access_token=${token}&overview=full
+With this in place, make a GET request: https://maps.googleapis.com/maps/api/directions/json?origin=${source.latitude},${source.longitude}&destination=${destination.latitude},${destination.longitude}&key=${key}
 
 ### Note:
-* we will be sending `geometries` as `polyline` and `overview` as `full`.
-* Setting overview as full sends us complete route. Default value for `overview` is `simplified`, which is an approximate (smoothed) path of the resulting directions.
-* Mapbox accepts source and destination, as semicolon seperated
-  `${longitude,latitude}`.
+Google Maps API Response doesn't have the complete polyline for the route. 
+The response includes *overview_polyline* which is an approximate (smoothed) path of the resulting directions.
+We stitch the exact polyline for the whole route by piecing together polyline from each step using the code below.
+
+```javascript
+
+// JSON path "$..points"
+const getSteps = body => body.routes
+  .map(x => x.legs)
+  .reduce(flatten)
+  .map(x => x.steps)
+  .reduce(flatten)
+  .map(x => x.polyline.points)
+```
 
 ```javascript
 const request = require("request");
+const polyline = require("polyline");
 
-// Token from mapbox
-const token = process.env.MAPBOX_TOKEN;
+// REST API key from MapmyIndia
+const key = process.env.GOOGLE_MAPS_API_KEY;
 const tollguruKey = process.env.TOLLGURU_KEY;
 
-// Dallas, TX
-const source = {
-    longitude: '-96.7970',
-    latitude: '32.7767',
-}
+const source = 'Dallas, TX'
 
-// New York, NY
-const destination = {
-    longitude: '-74.0060',
-    latitude: '40.7128'
-};
+const destination = 'New York, NY';
 
-const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${source.longitude},${source.latitude};${destination.longitude},${destination.latitude}?geometries=polyline&access_token=${token}&overview=full`
+const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${source}&destination=${destination}&key=${key}`;
+
 
 const head = arr => arr[0]
-// JSON path "$..geometry"
-const getGeometry = body => body.routes.map(x => x.geometry)
-const getPolyline = body => head(getGeometry(JSON.parse(body)));
+const flatten = (arr, x) => arr.concat(x)
+// JSON path "$..points"
+const getPoints = body => body.routes
+  .map(x => x.legs)
+  .reduce(flatten)
+  .map(x => x.steps)
+  .reduce(flatten)
+  .map(x => x.polyline.points)
+  .map(x => polyline.decode(x))
+  .reduce(flatten)
+const getPolyline = body => polyline.encode(getPoints(JSON.parse(body)));
+
 const getRoute = (cb) => request.get(url, cb);
 
-const handleRoute = (e, r, body) => console.log(getPolyline(body));
+const handleRoute = (e, r, body) => console.log(getPolyline(body))
 
-getRoute(handleRoute);
+getRoute(handleRoute)
 ```
 
 Note:
 
-We extracted the polyline for a route from Mapbox API
+We extracted the polyline for a route from Google Maps API
 
 We need to send this route polyline to TollGuru API to receive toll information
 
@@ -64,13 +85,17 @@ We need to send this route polyline to TollGuru API to receive toll information
 * Similarly, `departure_time` is important for locations where tolls change based on time-of-the-day.
 
 the last line can be changed to following
+
 ```javascript
 
 const tollguruUrl = 'https://dev.tollguru.com/v1/calc/route';
 
 const handleRoute = (e, r, body) =>  {
-  console.log(body)
+
+  console.log(body);
   const _polyline = getPolyline(body);
+  console.log(_polyline);
+
   request.post(
     {
       url: tollguruUrl,
@@ -79,7 +104,7 @@ const handleRoute = (e, r, body) =>  {
         'x-api-key': tollguruKey
       },
       body: JSON.stringify({
-        source: "mapbox",
+        source: "google",
         polyline: _polyline,
         vehicleType: "2AxlesAuto",
         departure_time: "2021-01-05T09:46:08Z"
@@ -95,4 +120,11 @@ const handleRoute = (e, r, body) =>  {
 getRoute(handleRoute);
 ```
 
-Whole working code can be found in index.js file.
+The working code can be found in index.js file.
+
+## License
+ISC License (ISC). Copyright 2020 &copy;TollGuru. https://tollguru.com/
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
