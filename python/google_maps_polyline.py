@@ -60,7 +60,7 @@ source = '1100 E Spring Creek Pkwy, Plano, TX 75074, United States'
 #Destination
 destination = '901 S Kobayashi Rd S, Webster, TX 77598, United States'
 
-#Step 2 : Get Polyline from Arcgis
+#Step 2 : Get Polyline from Google
 polyline_from_google=get_polyline_from_google_maps(source, destination)
 
 #Step 3 : Get rates from Tollguru
