@@ -27,6 +27,14 @@ The response includes *overview_polyline* which is an approximate (smoothed) pat
 We stitch the exact polyline for the whole route by piecing together polyline from each step using the code below.
 
 ```python
+import json
+import requests
+import os 
+import polyline as poly
+
+#API key for google map
+token=os.environ.get('GOOGLE_API')
+
 def get_polyline_from_google_maps(source,destination):
     #Query Google maps with Key and Source-Destination coordinates
     url = 'https://maps.googleapis.com/maps/api/directions/json?origin={a}&destination={b}&key={c}'.format(a=source,b=destination,c=token)
@@ -58,6 +66,16 @@ We need to send this route polyline to TollGuru API to receive toll information
 the last line can be changed to following
 
 ```python
+import json
+import requests
+import os 
+import polyline as poly
+
+#API key for google map
+token=os.environ.get('GOOGLE_API')
+#API key for Tollguru
+Tolls_Key = os.environ.get('Tollguru_API_New')
+
 def get_rates_from_tollguru(polyline):
     #Tollguru querry url
     Tolls_URL = 'https://dev.tollguru.com/v1/calc/route'
