@@ -39,7 +39,7 @@ def get_rates_from_tollguru(polyline):
     params = {
                 #Explore https://tollguru.com/developers/docs/ to get best of all the parameter that tollguru has to offer 
                 'source': "google",
-                'polyline': polyline,                       # this is the encoded polyline that we made     
+                'polyline': polyline,                      # this is the encoded polyline that we made     
                 'vehicleType': '2AxlesAuto',                #'''Visit https://tollguru.com/developers/docs/#vehicle-types to know more options'''
                 'departure_time' : "2021-01-05T09:46:08Z"   #'''Visit https://en.wikipedia.org/wiki/Unix_time to know the time format'''
                 }
@@ -56,31 +56,41 @@ def get_rates_from_tollguru(polyline):
 '''Testing'''
 #Importing Functions
 from csv import reader,writer
+import time
 temp_list=[]
 with open('testCases.csv','r') as f:
     csv_reader=reader(f)
     for count,i in enumerate(csv_reader):
         #if count>2:
-        #   break
+        #  break
         if count==0:
-            i.extend(("Polyline","TollGuru_Rates"))
+            i.extend(("Input_polyline","Tollguru_Tag_Cost","Tollguru_Cash_Cost","Tollguru_QueryTime_In_Sec"))
         else:
             try:
-                source_longitude,source_latitude=get_geocode_from_mapbox(i[1])
-                destination_longitude,destination_latitude=get_geocode_from_mapbox(i[2])
-                polyline=get_polyline_from_mapbox(source_longitude,source_latitude,destination_longitude,destination_latitude)
+                polyline=get_polyline_from_google_maps(i[1],i[2])
                 i.append(polyline)
             except:
                 i.append("Routing Error") 
             
+            start=time.time()
             try:
                 rates=get_rates_from_tollguru(polyline)
             except:
                 i.append(False)
+            time_taken=(time.time()-start)
             if rates=={}:
-                i.append("NO_TOLL")
+                i.append((None,None))
             else:
-                i.append(rates['tag'])
+                try:
+                    tag=rates['tag']
+                except:
+                    tag=None
+                try:
+                    cash=rates['cash']
+                except :
+                    cash=None
+                i.extend((tag,cash))
+            i.append(time_taken)
         #print(f"{len(i)}   {i}\n")
         temp_list.append(i)
 
