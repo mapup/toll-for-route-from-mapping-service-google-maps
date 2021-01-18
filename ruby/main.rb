@@ -1,6 +1,7 @@
 require 'HTTParty'
 require 'json'
 require "fast_polylines"
+require "cgi"
 
 # Source Details
 SOURCE = 'Dallas, TX'
@@ -9,7 +10,7 @@ DESTINATION = 'New York, NY'
 
 # GET Request to Google for Polyline Pieces
 KEY = ENV['GOOGLEAPI_KEY']
-google_url = "https://maps.googleapis.com/maps/api/directions/json?origin=#{SOURCE}&destination=#{DESTINATION}&key=#{KEY}"
+google_url = "https://maps.googleapis.com/maps/api/directions/json?origin=#{CGI::escape(SOURCE)}&destination=#{CGI::escape(DESTINATION)}&key=#{KEY}"
 RESPONSE = HTTParty.get(google_url).body
 json_parsed = JSON.parse(RESPONSE)
 
