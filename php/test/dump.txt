@@ -1,0 +1,77 @@
+from =>Dallas,TX
+to =>New-York,NY
+polyline =>
+sp`gEtrxmQaiCshUk|Uaio@_dJqvTawAojKu{IguNauMc~NwwAw`PndAid~@rRc}KkuAgvG_qEyib@xh@iceAurGwlW}~KujQ{fEoiTaaKo`MwlQkb\qyAkpT{XqnUtuCgk]yhG_pZo|QotXoqF{uS}fMqq[}qV}la@eb^iqg@uvV{~Qe_N_jDed^}x^}`a@qyi@yzIa|Q_tLqe\imFoxT_rE}vLuXqxHqrDqqHuoFcdD{s@myPy_Ai_d@l@e~YidBa_b@}`Es~b@s`Iy_VwwC}pTk}Hegf@irJoz`@{sMksb@cwFov_@}oBagi@v`BciWvRoiFetFgt@oFo{MblFwiIauP_}b@ymVg|h@csQapb@ijKqxGidFi}M}iL_zh@emI_ge@sxKq`h@giJgxm@ysAgoYwuAwsOqnF_|RvK_hVecBweUjBshN_}B{qKm{F}tJ{nI_}RiaD_o\_AgeWmmJchOpp@w_XudLm~Pu|DaiOv`CkxHk[a|VyzC{gd@mnAe_e@zhCaeUkTm`I}\khWzoEikPfbBitOjyFgiJ}fH{qQbL{xXi[{eg@pkKyiOvpPucc@bbNa}X~qCk_KgzAkiHlr@a{S{zBy{MxcImpd@oxAijN~X{aKmzGch^atLqgd@umDekInf@u`Hj|Cwyc@yeK}ke@ikNcrSmjJ}eWkoK}ni@oeOmj]_fJss^chHecRefGokM_tPapc@mvJqvWuzGysWooOmxc@c}Equa@iaCmaSegFa{QcsLsfn@slGe}`@xuCcfPalB_gVetI{pUilLqyIapAy{U_rAymUyzG{yWuvIg~KqsG}rM{uUaur@{oMwpJkgIwjSakG_mNkqKe|J_xQif\smUs|O{tHgjGeoDwoKi}KwaMmgMo`Ma`RekQyqP_|HkvPgvJwpJet@icHo`EcsM}iOyjQscMeoRyvMu`M{vAeyl@cil@wcBkcP|UkkGpqH}lSxnFm}O~\s{WfbHo{OrzA{sUbcD_oTxpCadLuoBu}SuvH{b\qxB{kSkvEya@umJavF{fCc{BidBgvGrKsbIs]}rRkdTi{Q_iUuf`@eqD{aFdQsuFnZcsHqeC_fEgjFue@g}EaaH}`Ms_RiqF_oSshJamPqrJcoRioFkrS{oB{dUmAasRsrF{sTiyAawS`|A_oOobHgw\eoXocm@grBq~LasJiqKcrLy}Rik^cre@miKqgRe}JgnHet]cxMauPonSqcCi`J}}Iu`Go~CwgAxo@{cBfyCahLvWevMkkEs|DcsLegC{_@fq@
+tag =>
+cash =>
+*************************************************************************
+from =>251-West,IN-120,Fremont,IN-46737
+to =>2323-Willowcreek-Rd,Portage,IN-46368
+polyline =>
+miu}FltweO[bJ@~HaKDeB?_AI{@[cByAkD_U{AaCgEWoDMgAmBx@eD~AEbAbBHlk@K~SgC`VkG|RuPfYcWna@gMbX}BfOyAhv@Q~t@xCtjAn@t^u@ff@sD`yAkOf~BcDla@iPdfAiEh_@_@tU}@nwD}At~EkBvtDdC~Z|Fpf@JrzCVvVrBjOhIdTnKfLll@hd@zIfJ~EnMbBjPSfm@qEpqAyKloA_Jho@sPb`AgEba@wAru@zB`qBoCrjAaGphA_Lvn@wHxk@k@f`@j@x|@xB|hDh@t~AcA`w@bC|l@|YfgBnM`~@tB~f@^tl@^nw@{@no@iGpbAoHnl@}VdoAuFra@Lht@~Fl~BjDjiB}@dh@_Cn`@gGvl@}Afe@`AfTrHvb@xLlj@xEb[hEfd@hB|`@fAb~CdAhb@dDxe@vJpr@jQns@fIlVd]pnAb`@jtBnAjUgBfTgDhLqHhNyQd_@wBlTzAp_AfAlu@o@xQ{IteARvh@fZhnBtBd_@l@tgApC~{CpEn{Ah@`u@m@fw@cD|{B{BdbBw@nyCwB`xA{A|yAH`q@wArd@cBle@Szi@Rbc@vEbc@rC`\Hht@CfnBCz|@gC`w@oIbgAQb|AZhbAfB~W~I~`@pLhWz^xs@tXrj@xMdf@vD|\jAlnAl@dhB[zsBqBlbBeDtRqVtd@iF~SEv{Aj@~tCaEn`@wLb\aO~ZcIz[}BrU]`\HzyAEttEaBh}@yIdk@}I~XgG`N_f@xw@}Uva@aG~PeFzXcBhc@c@|~BgHha@mXbm@}E~TuA|Of@~b@p[r}At]p_BlMbr@jClg@\`}@|Ddq@zFj_@pSds@hMt`@|Gra@jDf^hFdXnKt\~HhY|Efb@hAtgBd@td@tDdWlJlUzTxVfYrYp^|c@j^he@~Q~Z~Uzh@xX~a@rYz^rNbXb`@lpApJlQfLzMdRxPjItPnB|LQfd@eCjcBrAxh@fG~s@tP`~@~]tiAzNlj@nZf}AlNfd@nR~_@t^~c@pY|Y`[fd@d`@xm@`WvZrWj\pKdUjIpYpYtuArh@rfC|VriAfJxSfHfK`b@da@`HzJvIjUhGrf@bKbgAxRttBbPzvBpGhw@hHdb@l]rlAdUliAdKpx@rHtn@|Bbb@PnV}CzbAy@lx@u@xhByF~tAaHhbAuE`e@yTv`AwAjWMjk@~AxuAxAxnBnBjP`FbQrSj`@bH~Vt@dXi@pdBgBnLyGvP}PjU_LtWsCxPgAr|@i@dLeC|FsHfCkCvCyCtKc@xGn@fCjCA
+tag =>9.33
+cash =>9.3
+*************************************************************************
+from =>1615-Dundas-St-W,Whitby,ON-L1P-1Y9,Canada
+to =>3730-Concession-Rd-8,Orono,ON-L0B-1M0,Canada
+polyline =>
+snwjGfdaaNYXg@Ti@aEq@eFKw@}@{GmAiIiBeNsBn@]ReA`Aa@p@eAbCaBlDsA~AiC`BgBxA}DhCyD|CsDlDuA~AcKnMyFlHoFzFiDzCmAz@mAx@mAt@cEtBi@VuFrB{H|BiHvBsR~FuGnBoZ|Iqd@lNyI`C{Dx@_C`@_DTsDL_GAqG[{Mm@wGM{A@{DTqCRaEp@mCp@_GjBiGtBaGhBuN~Eej@~QmEvAcInCgDlAyBn@_OjD_IjBsHjAkEb@m@GeCDeCIiAMy@Uo@YqBkAgAeAu@_AeAaB_A_Ca@}Ai@gC[yDQcGWeKGQU{Ua@gd@I}OL{Id@wKd@_G`AmJjEuYlDeVx@gGhAeMr@sKn@kQHeKAuE?k@MmLa@eLeBeWwA{Oq@yI_@kEW_B}@iGgAwG_BsHaA{Dw@uCsCmIgBgEuCyFmBuDeAaCcDcGmSk`@eG_LkFoKeLkTqBcE_P}ZqGqMcE}IqDsIwHmSeBgFgCaImD}LgDsMeCoK}FkYiDsPyOev@sDiROy@m@gCaD}OcBkJ_AeIYwEQcHJyL^iHVgDb@qD`AyFdAyEbFiQjOsh@dGsS|[ghApS_s@`J}Zj@mBlDoMZaB`AyFd@iEZmDZaGJoE?iESeK]}Ec@iEmBeOiBmNm@_G]kEa@gIMaFGiFFyLVe^JcPA_JGgEOeE[wFaByP[cBy@cF_CqL_CwHwAoEiCcHwDsI_AqBuDwIkF}LeDcIyDyIsH}PeGaQsDoLu@mCuAgG]yA_AmEaAaGoBsMwAmKsAcOeA_V{Aga@s@}NeBaV_BoTuAuPuDae@y@iKmAsPkAgNgBeQy@gIiAsKm@{Dm@}Ck@{D{@kF_C{KeDsNqCqK{DaN}Le_@cKc[uFqPkCsIwCmJsGsRgFuOyEaOsL}^gP}f@uGyRmDmK_AsCeBiGsDaLsBwG{K_\mPuf@yFyQcBiGaCqMcBkLsA_Kq@oFWqCKsCAgERaFZeDX_Bz@uDd@kCNqBCcCQcB_@oBs@uBa@s@aAiAg@[iAe@u@McAGy@Bu@LiA^oAx@_AjAa@v@Uf@e@`Bs@lD_@xA_AhBsAxA{AhAqErBuEzA}Bh@yCT{ACiBQkAUoA_@y@]gAg@sCoAeCs@W]Ic@Bg@FSP_@fAy@d@YtBtBfAjA`@v@d@hBHtA?p@WdCk@rDWKMOGOUkASkAgA\
+tag =>10.37
+cash =>
+*************************************************************************
+from =>1-Rangers-Rd,Neutral-Bay-NSW-2089,Australia
+to =>799-Richmond-Rd,Colebee-NSW-2761,Australia
+polyline =>
+vvnmE_z~y[UN@RDVBlBAx@a@|Aq@dC}@bDgA|DgAjEK`B?jFc@hEIrBAfAAxAOx@S\GFg@RkAA[AkB?wBHcCh@KAuAl@mAt@cCpBuB|C[n@Kd@w@tB]vAi@lCuA`Ii@nBg@hA}@jBqBxCeBdBiEtD_Al@_Ar@iHxFqDzBgE`CsHfEwC`BqBrAkBpB}AfCmAjDg@rCUpDHxDZzCt@zDvAhG`@vBr@tF\vFHpDE`IStDg@zEsCnQk@dEQnBUdEEtDNlGf@hIHbGGbE]zFc@lDqEfW}@vGkAlKeAxJw@zFqAhGsArEeAtCyBvEaFlIkBbDkBfEiC|HuApEiCjG}B~DwC|DaDvD_BxBkDhGeBpEaBnFaBbEwAnCsApB}BnCmDxCoAx@eCrAoDnAsBh@kDd@kKx@sBXeB^oF|Aa@Ri@L_CZoAHwC@}IJcCFkCZmDbA}BjAoBzAsChDkLnQoLrQiH~KoChEeCvEqA|DsBnI{AlD_A|AgApAaDrC_JvFuDbDaCzCq@jAeCtDoBxDm@xAw@~BqAdFcAnGi@lHIzHTxGjAfLx@zG^rFCxGUbDs@zE_AzDs@dEObBMtD?t_@?|LQhFe@pFc@xCsA|G_CtNe@lDe@bFw@vOQpDWfE]~B_@~AeA~C{@fBoB~CoBzCoBxC_CrDq@rAy@pBkArDo@tCi@bDc@tGA~F\pGb@vDjDlYv@~Hj@pHt@xNj@tM\fF`@lEp@tFbEpW`BjFnAxCjI~MrBbEf@vAr@lCh@bDPxBDhBArDQvCe@xC{@dDmC~Hw@`Dm@~DSxBMrFBfCR~CXhCb@dCn@fCz@`CzEnMlBxFdBfH\lB|@rGb@zDXbErAjUn@xHj@xI`ApLbBhKfA~Gt@tFjBtKbCbNjBpJ|@vFt@jFdAnIbA|K`AjNb@bId@nJRzGI`EKbBa@vDaAnFcBpFaAzBm@fA_BdCkD`EuDzCkJhGgCxAsIrFsMhIiMrIuBzAkB~A{EhEmFpF}HhJmKhOuH`LaHbLaI~NsDzHaEjJgBhEm@jBu@dBuD~KsDvL{BnIiArEqBlIgBfJgJ~g@mCtOcCxOoBbOy@zHW~CkArMoAnOeCl[w@tMmAf_@uEh_B_@xLa@vHg@vG_CvS_CfSiMpfAWlGF|CLfBVjAr@pCz@vBbC|D`@pAf@xD\|@l@n@nDlCmBxBiBrBm@d@oOjHkGjD}B~@aDp@cDPyHLW?Gs@KaAC_AScACACI?IFQNELH|@Bz@G@EHIJ?HH@Br@HjBC@L@x@@HBHCJGZ@j@cADQ?KGAA
+tag =>
+cash =>
+*************************************************************************
+from =>20-Lichfield-Rd,Coleshill,Birmingham,UK
+to =>Stafford,UK
+polyline =>
+_wm_IlzlIe@xBaBjDuAnC?b@HPRf@Er@Y\w@TeBt@gBpBaBlBcHhF_TxM{LhFaKbIyDrGgBxCyAzAgDhCqB|F{AxD{Al@kFh@iIl@yEb@cAOkBs@aI{HiKmJo@Sc@VKRe@VsD~@mQB_El@{DtAmIrDmBhASp@i@pH_AlCmAtCQpBLbFFXCZY^[[eAiAiD}@cCUsMM}@AgAO_FX_Dp@eHtCsDhCaD|CuDdFkErIkC|GiNn`@gJ|UiG|LaIpMeKzPsGzMyE|LiInYiD~NqEbRwDdK{BrEoCpE{CrD{ElE{EtCmGhCcLdEcIlFiCjCyEbHkCpFaDhJcJx[kEtJuCpEgFxFkMfJkHbEuI|D}O`FeKxB_LlAwKd@_OKqQ{AkLS{FZ}Dj@}Dz@aGtByKdFuG`CuJlBySdC{QxCkMjC_RxEyI`CeLtEoGlDqLxJcItJ_H|K{G`OwK|Y}Lta@kIn]qDdQoH~]gOjl@kE|RwClRgC~WmAn[IrRPjO|@~SfCxXhFj\vBnLbB`Nr@vLPbQWlLiAlOiAbI_CdLcDjKyEfKoI|PgIxSwH`WyEvS{D~TiDtXqCt_@i@xSFvKj@xMbCjTvC|Ut@vNBbSkAlSqA|JmBfL_DzUkAbSMxLV~UjAr_@B|QYvQs@lOeB~R{Gxe@eJfg@cAbHmDtQeLh_@wFpSwBrLyAzMg@tIS~Oj@fTnAxOfBxUt@|Pb@xWPrS^pKdB`QfBnJlClJxHrSxD~LfCnK|BfN~@rKTtLGhHS|E_AbK{BrLmDrKsC`GwI|PgGxMsWlm@if@heAqFdKiJhN}I`KeJ|HeIfF{JvEqLjD}En@kINqHs@uJkCgf@wPqKiCkFe@mGA_NlAgWpCoL`@mJa@_Fm@yHcB_[qHkSmEuFo@aIc@kOL_UpBkj@fFo_@hDiYpCuHlBsGtCyE|CaClBeClCcC|DyDzGe@dASxCg@`Aq@Rq@e@{A}B_@oCo@aAw@k@gBy@kBUiBBqGzAyIxC{CfA?LCVKL]CGQaF`BsIjFkClA_BhAuAnCcGfD{EhAmA`AeCvDkAlA{Ad@sN?aJd@aETgBx@]\iGjFgA~@cBbCeChEaDtG_BdCg@F{Ae@gEgBwCu@iBWuBy@yFoBqH}BmFIoAy@gDiDyHoF}BiAgHiG{@WiA\_BjAsBrAWt@[rBpBvNh@hENbBVnCa@P]`@k@tAuAlD}@xA[XeA}B{@mBk@Wa@P_CrDw@`Au@Ju@KOEIq@NyBu@gCCAAGDGv@aA
+tag =>6.37
+cash =>
+*************************************************************************
+from =>69125-Colombier-Saugnieu,France
+to =>14-Avenue-du-Vallespir,66480-Maureillas-las-Illas,France
+polyline =>
+m~`vGeh_^yGp}@`{@c@btAeF|i@la@v\zk@dy@fe@fj@pNN~h@qeB`sHo{ArlD`NbCtZuT|a@dVnxA`z@zaApeE~wB~{@pr@vaCzfAl@daA~f@bTpmAfl@~}Ap|@|~@jU~}@|OjnDeGbsApt@kVrdB_dB`xB}zBl\wjBttAkk@`pAhf@~|@zaBngAb`@pcAbA|lC|LfcDbq@hdBwVjcDbeC`rA|Hvh@kTxwBtMnnDeg@nvByOji@kp@|v@HxfA}XzyA_{@trA|Dft@cr@|~BwaBl{@_g@`[_x@||@_E~t@{V|sAar@lkD{B`eCkq@dpB|rAhm@h]h~@aDdrAt}@t|Aui@b}C_CjwDzDp~B_h@vnBsOvpBw\`|@Cpp@x]`~@hl@xy@BlaE~`AjiE`Hv|FviAxrA|aAbeAlzAp}@prCnuB`jAniC`S~pArUjwBkJpuCe_A~nDx]jgEAxlJkrBj|Cn{@buC|qDdgAba@zmAtB~oBtYz}CdgA`rBndBtaA|[zhBxArhEgg@r~DeNn`Emq@|wA`l@jcDbfC|jCjcAxdCezA|s@sOx}@qe@v`AckB|yAchAbvEkeCvw@mu@bx@tBp}Bf@j}BjhBdxAph@|z@_N`bAlO`j@rExlBpwDzgC`kF~oF|wK``CtnCr`C|}D|rAvpCb]hlEtmAbpClq@b`Fho@jwBlfAzqAp|BpbB|xBh_F|wA~oGbh@jrCjdBtkBlpAfeBlkBfxBv]|~@}ExxAnEfbDnyA|sArw@z|BfMpsCx{AtaDfbAv_Clm@xhFjuAdrF`|Ap}CtnCdvDdcAxl@r}@lqAfbBhxAblBtvFfcAr|BjMhyA`Ub`Czg@pvApw@huAfU`jB`tC`wEdcDhpFxt@|`AbWf{Ald@lbFxzAd|Dtw@jwCpc@duCrt@|lAvw@hp@d`@zf@z[tjBheApcEbjA`|EpmBhyCjZdmE~wA`yGtC|qBxe@~sAddArtBteAd~EthC~dE|dBdnIjkEnfDftBlkCbkAhwCxp@~lD`mBbmAzzBhdDtxCb|KnkCv~An_BpfBv`Cn}AjrBjm@d_ChAjjAyQrq@_j@f~@_e@~tBfC~qBc`BjkAcf@|lAzTdtDRtyAg@bn@i{@jeAccAto@sJh|B|F`lAzn@xo@faB|n@dtDvt@~eC~a@lj@b}@vAxmDviAxxGbe@rq@Af~@`g@fhDzdBh~Atj@biBTrfHvMtvGjlApgCjSrlBy\|p@zl@bp@xfB|y@`q@zMu{@hf@gQxl@ff@v]fQxg@ry@tVv\
+tag =>
+cash =>
+*************************************************************************
+from =>Göteborgsvägen-49,431-30-Mölndal,Sweden
+to =>Lilla-Waterloogatan-2,415-02-Göteborg,Sweden
+polyline =>
+cv}~IqbihAsBj@CEIGCACc@?qALSjAg@ZURED@JE@CRETSHQHg@EgBEoA?uA@a@HcBLoBDyABmEkANOJMRK\E^Aj@DlAAr@EXKXMRcAr@_Ad@}@Z_ATqCf@cBb@kA`@_@Pa@\iAd@[J}@ZsC`AcHdCoCfAuAl@oEzB_MjHmHjEiAj@y@ZaErAmAb@oCtA}BrAEFk@^eEpC}B~AgGtEgHpF}PxM{EvD_EtDcBxAc@\aAh@mAl@a@N_APuB|@qEdBeA\gDx@eBb@k@PaAf@yBhA}@b@cA\q@T}@R_ALqANYBi@?oBLy@JyBRkCPsEVcA?cAKmB[aAQsBYiDk@aB]{A]aE{@qCm@sD{@]Oq@QgBc@gB[s@EoAFg@Lw@\i@d@c@h@cAlBqAhCw@`Ac@^c@Rk@No@Dq@EoAQe@C_@Bw@Ps@`@]VaBfBq@j@qBnA{CdBa@Xe@`@cANMB[CSEYQYg@Si@We@o@wAm@w@c@e@}AoAsAoASSGCG?cA{Am@{@c@q@Ym@a@k@gAqAyA_B{@u@gBmAeAe@oBy@WGa@AkASs@Ew@Mg@BY@{@Fo@HgAHY_@KYUwAViA\kAv@yBPg@@B@DFFNBLKHY@]G]OMO@EDCDQo@[{@]_AuCsEEQa@g@CRaA|DYhA
+tag =>
+cash =>
+*************************************************************************
+from =>3100-356-Pombal,Portugal
+to =>3060-565-Cantanhede,Portugal
+polyline =>
+ckwrFpw|s@YcCAcAzAgC`IgJf@oCB}\?sCAgBKa@q@~@g@z@c@bB}@dGsAfEqBdB}L`G}G~CkDbBaAl@qEhFhAfCZf@dA|AfNvTfA`BtAjBhAvCOpCeAvBcCpAsCa@aL}L}HmKqEgFeJ{GiHwCeFeAoMwAqGy@{GoB{GyDkH{HmPsV{G{F_HeE}F}DiGeGcD}EeDwHeKgc@kYm_AsSwp@gEkJqEyG{EcFkSmNsGsGmDkF_JoP{HkJuKwH_IcEqJeHoL}LuG_F_I}DiGmBeJwC{FuCoKsI}HcJqEiEwDeCgJ{DwK{CsG{C}FuEsSqVgIeImJ{HkMoIyTuKgMkGiIcF{R{OgOsPiS_ZwHwIsEgDkTkKyJeI{HcL{CcHoHoUiE}KsLyVcOwUiSo\}HmJyIaGuG{CkJgFuCyBiKiK_IeG{GuCaLkBmH@mKv@cEFoE]gJkCmImFiJyE}I_BaEOkELuGd@aKWaJcCgJ}EkNyLyFgDuDwA_LgBkScA{JsBsJeEyNmLoSyWcSsT_F_HmFuKiEuOoBmNcAaQuAsLsDqMqEuIkGyGuGuD}IyB{HWuKHwDYmFoAwJ}EwI}DuF_BaG}@yIe@uHLwIfAwU~GkKlBmKj@}JQaRoCsMgC}Ee@uLCkE^iI~AeOxCmKFiBQwHcB_JeDyJuCeKiAqGu@qEkAsEyBkEgDiI_HuE}BkKcCmJs@qMDeMnAgSzDmJfAsFRaIG}Jw@aZkF{NuAgJKq^p@sZAmZq@cUGsNfAuTtDkNvA}IIqVwCqMy@}RDkGO{IoBwGmDaGsEiKwFyKgCkJ_@_RtAqHE{HsAeI_E}K_JaJiGwGyC_KyBaESoJd@aJ`CqHrE_GlGuIrJeHdF{KfFwIfC{M|AuNTuJBqK`AmNpDyNfFoLdCcN`AmRx@yLvB{TjGqKfBuEl@gHVwSRoFNgK~@yGtAsMfD}JdCaL~AqJ\iJc@{VkCyPEaHC_Ik@yQiDkCk@iJkBuOoAgG?yI`@mVdCwLj@wIUqBw@cBuCS{BB{EpAad@x@g]D{MQaD{@eMR[JBtAjBnCfEhCvEZxFyAxHqAvGKtBXfCxApEJr@YfAuHeEi@`@OlEQj@a@B_BAu@^UbEMdCk@pAQdAN|BOpAqA`BcBx@qI~BiAx@D~RHjLa@nC}AdCoAbCq@|BsAvCIZmCLkCa@aFwDcCoDc@]qALiCEyBE_FNG`@J|BLnG_C`BoD`BcCZsFT{El@IsBE{@cCNG?KIMe@Ie@
+tag =>4.1
+cash =>4.1
+*************************************************************************
+from =>2050-Jessheim,Norway
+to =>2670-Otta,Norway
+polyline =>
+wqbnJcpdcAim@cPu{@lBiAp_@fA~^yYcIow@uf@uk@qnA{Us`@{g@ePysApYifCvlAqq@kZwYkTgl@wH}fAly@{t@zbB_v@`cA_b@h|@q`@lRwcBio@{b@yIqWye@_g@qsCuh@uzAmg@}f@sa@az@wb@i_@woApW}`AEor@mWkaA{g@{]ml@yj@cnAmx@y\geAsBmtCyHsn@fL_Yv@uQiO}}@e]wy@fUch@rh@s]tAeaAiL_lAu`@sh@pJuiAqGupByXynAgr@}aBq{BmaAwdAu[cfAov@gcAk]Z{b@t_@aw@l[}d@cB}_AnNcmA`a@uxClb@yzAlo@gx@jUut@dsBysBfyEuXhi@kv@lg@_~@vfAyl@b_@{p@hiAuo@tlCwz@xrC{R`_@kr@zc@kxBroC_l@`k@_r@d]qd@xuAg_@h~@}FpwAs[jtBwm@x`Fca@znCmPxlAqW`q@wj@lj@yi@vqBak@zmE_\xoAaLdvC}QlrAom@hwAu~@rkDyBhhDl]lwCvFdlBkO~`Agi@fxA{UbqAab@h|AqEnfB{Dbh@{dA`eAew@`_@ka@|wAy]rNyY|g@ab@poBmhAj~Cud@pgCiOjeCu]xjBgd@fyA}vAj_E{n@`sAgp@||@av@~ZsYtX}YgGkf@lH{w@xSyaAcCqtA`Bcl@_\oeAgl@cq@ePaYiAuVjQky@frAcy@`mAqWrMu[gB{YtGk]p^}p@sF{r@iOa[gb@mZuAaQpKco@`Lw`AmaAmj@wpAss@mi@ch@gKkuAj_AwRtBiTcEuYtFqu@nnBcd@|t@ck@dvAuVxx@_HpwBpAb{DgQd_Akx@`z@ipAh_AwT|Wai@fRkj@h{@}p@rPs^rDkVuSmo@vN}}@dCg~@{Awp@li@w]ll@g_@~i@qPzz@gUnkB{|@~|@ec@lUuV}D_ZbMsr@zCyi@jnAac@rz@io@hDkZnYqe@fcAmVjVyb@gRkq@sQmYiJaJg@iU`XuXxVmYzEiz@zk@a|@pd@s_@lGmd@`]i_AdaBuNf`Cg\`}B_S|yAoc@fiAwc@xyC|Rf`C}\|nIsL~rCkInpBuR~t@wg@hjAiJl}@mKtpC`K~bAsJt{B_]zxCwNbaAvC~sAjGdgAmMriAup@lzDyv@vqDmhA`z@ciB|Rs^jJgl@hj@ypA|nAmlAbpAyOt~AeFj{AbX~fEc{@tpGik@naBkZfZ}h@|@akAue@}j@fFq]fb@gXha@eLrT_ZuKyr@c`AuUsVcUqYyZjAuYpPqe@b|@ss@eEuc@^i\zMeB~[
+tag =>
+cash =>
+*************************************************************************
+from =>Caraun-More,Ireland
+to =>Johnstown-Way-Enfield-A83,Ireland
+polyline =>
+ykedIztas@eCiAcA}Ji@iJkBkAJy@rCyPwDeFgUs\aMoRaDaE_J_F{C}AwCkQeBoN{IoXaMiX{@qKmCqImEqTUcLgAmI_DoD_JiGrCcO~I}GbGwIrRuDrT{OvFyLfE?rKWfFoArF`@lBKIsAw@wMe@{PrAkQfCcKZoKhGkg@nFsq@rDyTnCii@nFy\z@yv@jHiIdDc[j@s\qHaB_GgIyJwV}GaO`AiKCgu@sF_R`@il@bAaW~DwNuEkv@?yEcCuO{CmXmBiOH{GC{VcHsZwRex@{Oag@{Qm_@oMuPqQmReJ_SaH_]wFu]mBiu@sCmVqIgUwSwh@kDuNu@eeA@ob@q@uMiGyf@aXk`AqCiP@qB`AL`GIl@yDGsPa@u_@Cuv@jByaA~HsaAzDwb@pBcj@Kkm@qAa_@{OwzA{Lip@{Rmq@m[{jA_PaaA_L}c@yNm_@s[oo@_JaWaUo`AuSy}AwPuk@eNgVuHeIaGuEaMwEoWkBeKaDuXmQg}@ck@cVsGu\qBgb@_C}UgDqVaIkPkRaGmO_EgSmLkv@aJmi@wMm_@}PoZkIyZsBiRa@a\Py^}@aScCeT}DkN}[ck@ePeZyUycA}HgVuMeY_MaW{BuP}@}}@|Bw\lOy|@pNwm@dOsgAr@mb@bBgVxCwKdH}KnMyFbVyF~MwHxe@mb@tR_ZnJyYtEyYtAmSRkp@|EcfBjLg_BfO{oAtHo~@hDkuAnCcm@jFgk@tOmsAbEoy@dDucA|Emo@~C_sCMaoAgDumAc[}dEyLmvAmAwr@jCcy@tJ_v@|Sqy@`I{j@fEcq@hHes@pKas@r^e}AjT{dAvMgp@pRee@hUmd@xHaXpFgZjHgo@tF{cAv@{t@cAww@wBkz@fAmy@PoaAkEqnAmAcfAeCqt@aGcb@uEsRoLo[}NcZaVys@eIuSqSc_@cReZuOm\iWqt@ySms@sRu{@qOaoA}JoeBcMctAoSquAqM_m@eSen@ia@g`AkZu_AoXwmA}L{n@aOch@aQgb@yZag@wTc\eVwd@kNa]yKg^_Hga@_CuY}AmbAqGmyBPiaA|E_eA@gj@gBkd@gF_bBrEa`AxO_lBzJeuBjNsmDvEqq@tFad@pQo~@dOgh@pVom@zNe[`Kma@fDk\r@k`@sFc`BWe}AnC_~Az@{RdDaYhE_S|GiRtSe^tU_`@vHoPjDkLpF{^n@cf@kHqkA}@u]j@al@vE}k@zK_s@?cFd@kAr@l@h@fBnC~Af@\H`@rEnAzFyB@WIuH{GgXsFiOyO}QcBoA_@hA}@nC
+tag =>
+cash =>
+*************************************************************************
+from =>Stougjesdijk-294b-3261-KW-Oud-Beijerland,Netherlands
+to =>Albert%20Schweitzerplaats%2025%203318%20AT%20Dordrecht,Netherlands
+polyline =>
+}ih{H_nbZmA_@u@WSO{@a@e@[c@a@i@y@Wm@[aAUcAKcADKBMA]MYIGE?Mm@MgB?eBV{FRoFtCmi@hAiSfAaSfAcO`AwPRcCRqEPeEBkBz@uQf@cJFkALaAn@yLPaCHkABABAFIH[AWESHiDFkBVwEnAoT\mE`@{CVwAt@sC^mAj@uApAgCnDkGxAaCrIoNzCwErDeHbEmHjH}LvByD~@aB`AwB|@{BhAgDx@cCb@_Bn@kCb@aCTwAp@mFFeAvAmJvE}ZbCePFQP_AZgBh@aDh@kD`AqGLgAtCmRxC{Rj@{Cl@iCpAiEtByFpCuHN[d@sAn@aCVsAjAiG`AuD`@mAzAmDRe@hEiHfBoCjJcLl@}@`@y@b@oA\sAJk@XeCFuBAkBIgBWwBa@mCQ_BKaC?uABoAVuCTmAj@wBLSdAmC|BcGLCRSD[?ObBeEhBiFF]l@_B~@aCf@mAnE{K`K}VzCwHVs@Vc@~@{B`AgCHSB@F@JEJSBe@AKtCgHX_AD[Xy@h@sBb@}BXcCToDl@kT~@g]F_BVyIR_HTcINsFt@eXHiD?i@R{GvA}h@f@{MFaBP{ANmAb@oBt@qCL@HEJOFg@hBaAjAi@x@W`AWbB[`BWv@GjAE~AIjAHhADhDXzHt@pCXVAZMNMNSHULg@JwAZqGZyIVwJR{IPyKJuRBqj@@_|@@{WHuUByN?wMAwIAkCAsKC}EGiCOcCUiCWcBc@_Ck@wBq@sBi@oA_AeBeA{AgAkAkAaAy@g@wAo@sCiAyCmA_DyAaE}BiBmAyAeAeBsA}DoDuBwBmAqA}DqEiBmBw@w@qAgAoAaAkD{ByBuAmEyCcEiDgCyB{G}F{DmDsAwAcAkAw@aAOc@i@{@u@mA{@cBuAgDoAwDy@{Bq@eBEYI[Ak@DWh@yA~@wCp@eCb@kAr@wAN[FBN?JKJWAi@IQ?WJw@Le@nBoDxAjCDDHI
+tag =>
+cash =>
+*************************************************************************
