@@ -6,7 +6,7 @@ function getPolyline($from, $to){
 
 $key = 'google.api.key';
 
-$url = 'https://maps.googleapis.com/maps/api/directions/json?origin='.$from.'&destination='.$to.'&key='.$key.'';
+$url = 'https://maps.googleapis.com/maps/api/directions/json?origin='.urlencode($from).'&destination='.urlencode($to).'&key='.$key.'';
 
 //connection..
 $ggle = curl_init();
