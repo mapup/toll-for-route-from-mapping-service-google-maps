@@ -1,0 +1,16 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "description": "### Getting key to access Google Maps APIs. * creating account with MapmyIndia * go to signup/login link https://cloud.google.com/maps-platform/?hl=en * you may need to add Billing Account, in that case make sure you select   Currency as USD.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "polyline": "^0.2.0",
+    "request": "^2.88.2"
+  }
+}
