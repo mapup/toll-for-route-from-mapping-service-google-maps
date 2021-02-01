@@ -32,7 +32,7 @@ You can specify "departure_time" as DateTime (string) or Timestamp (number) to p
 ### All types of toll systems
 Support for barrier, ticket system and distance based tolling configurations
 
-### Support for [other mapping services](https://github.com/mapup)
+### Support for [all map services](https://github.com/mapup)
 [See the Mapping services list](https://github.com/mapup/toll-google-maps/wiki/2.-Mapping-platforms-supported-by-TollGuru) for all mapping platforms supported. You can edit the **source** argument to send polyline from another mapping service.
 
 ### Support for trucks based on [height, weight, harardous goods, etc.](https://github.com/mapup/toll-google-maps/wiki/4.-Trucking-parameters-supported-by-TollGuru)
