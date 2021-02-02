@@ -9,7 +9,7 @@ The toll information has following [key features](https://tollguru.com/developer
 * Asia - India
 * Latin America - Peru, Colombia, Argentina, Chile
 
-### Based on vehicles in use in each country, [vehicle type support](https://github.com/mapup/toll-google-maps/wiki/1.-Vehicles-supported-by-TollGuru)
+### Based on vehicles in use in each country, [vehicle type support](https://github.com/mapup/toll-google-maps/wiki/1.-Vehicle-types-supported-by-TollGuru)
 * Car, SUV or Pickup truck. You can specify number of axles including axles in trailers
 * Carpool
 * Taxi
@@ -33,10 +33,10 @@ You can specify "departure_time" as DateTime (string) or Timestamp (number) to p
 Support for barrier, ticket system and distance based tolling configurations
 
 ### Support for [all map services](https://github.com/mapup)
-[See the Mapping services list](https://github.com/mapup/toll-google-maps/wiki/2.-Mapping-platforms-supported-by-TollGuru) for all mapping platforms supported. You can edit the **source** argument to send polyline from another mapping service.
+[See the Mapping services list](https://github.com/mapup/toll-google-maps/wiki/2.-Map-platform-service-supported-by-TollGuru) for all mapping platforms supported. You can edit the **source** argument to send polyline from another mapping service.
 
-### Support for trucks based on [height, weight, harardous goods, etc.](https://github.com/mapup/toll-google-maps/wiki/4.-Trucking-parameters-supported-by-TollGuru)
-You can receive tolls based on vehicle height, weight etc., while calculating toll: "truckType","shippedHazardousGoods","tunnelCategory","truckRestrictionPenalty" and [more](https://github.com/mapup/toll-google-maps/wiki/4.-Trucking-parameters-supported-by-TollGuru).
+### Support for trucks based on [height, weight, harardous goods, etc.](https://github.com/mapup/toll-google-maps/wiki/4.-Truck-parameters-supported-by-TollGuru)
+You can receive tolls based on vehicle height, weight etc., while calculating toll: "truckType","shippedHazardousGoods","tunnelCategory","truckRestrictionPenalty" and [more](https://github.com/mapup/toll-google-maps/wiki/4.-Truck-parameters-supported-by-TollGuru).
 
 
 
