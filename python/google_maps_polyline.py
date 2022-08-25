@@ -55,7 +55,7 @@ def get_rates_from_tollguru(polyline):
     # polyline = get_polyline_from_google_maps(origin="New York, NY", destination='Dallas, TX',
     #                                           google_maps_api_key=GOOGLE_MAPS_API_KEY())
     
-    #Tollguru resquest parameters
+    #Tollguru request parameters
     headers = {
                 'Content-type': 'application/json',
                 'x-api-key': TOLLGURU_API_KEY()
