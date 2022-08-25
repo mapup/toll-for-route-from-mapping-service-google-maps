@@ -49,7 +49,7 @@ def get_polyline_from_google_maps(origin,destination,google_maps_api_key):
 
 
 def get_rates_from_tollguru(polyline):
-    #Tollguru querry url
+    #Tollguru query url
     TollGuru_API_URL = 'https://dev.TollGuru.com/v1/calc/route'
     
     # polyline = get_polyline_from_google_maps(origin="New York, NY", destination='Dallas, TX',
