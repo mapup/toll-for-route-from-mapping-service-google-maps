@@ -9,7 +9,7 @@ The toll information has following [key features](https://tollguru.com/developer
 * Asia - India
 * Latin America - Peru, Colombia, Argentina, Chile
 
-### Based on vehicles in use in each country, [vehicle type support](https://github.com/mapup/toll-google-maps/wiki/1.-Vehicle-types-supported-by-TollGuru)
+### Based on vehicles in use in each country, [vehicle type support](https://github.com/mapup/tollguru_vehicle_coverage/wiki/Vehicle-types-supported-by-TollGuru)
 * Car, SUV or Pickup truck. You can specify number of axles including axles in trailers
 * Carpool
 * Taxi
