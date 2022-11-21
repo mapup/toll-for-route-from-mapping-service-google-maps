@@ -2,12 +2,12 @@
 Click on the folders above to see examples to extend mapping capabilities of Google by adding toll information from [**TollGuru**](https://tollguru.com/) to the route information from Google.
 
 The toll information has following [key features](https://tollguru.com/developers/features):
-### Support for [geographies](https://github.com/mapup/toll-google-maps/wiki/3.-Countries-supported-by-TollGuru) 
-* North America - United States, Canada, Mexico
-* Europe - UK, France, Spain, Portugal, Ireland, Netherlands, Denmark, Norway, Sweden, Italy, Germany
-* Australia - Australia
-* Asia - India
-* Latin America - Peru, Colombia, Argentina, Chile
+### Support for [geographies](https://github.com/mapup/tollguru_country_coverage/wiki/Countries-supported-by-TollGuru) 
+* North America - Bahamas, Belize, Costa Rica, Cuba, Dominican Republic, El Salvador, Guatemala, Honduras, Jamaica, Nicaragua, Panama, Puerto Rico, United States of America
+* Europe - Albania, Andorra, Austria, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Croatia, Czechia, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Kosovo, Latvia, Liechtenstein, Lithuania, Luxembourg, Malta, Moldova, Monaco, Montenegro, Netherlands, North Macedonia, Norway, Poland, Portugal, Romania, Russia, San Marino, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, Ukraine, United Kingdom
+* Australia - Australia, New Zealand
+* Asia - Bangladesh, India, Indonesia, Laos, Malaysia, Myanmar, Philipines, Singapore, Taiwan, Thailand, Vietnam
+* Latin America - Argentina, Bolivia, Brazil, Chile, Colombia, Ecuador, Falkland Islands, French Guiana, Guyana, Paraguay, Peru, Suriname, Uruguay, Venezuela
 
 ### Based on vehicles in use in each country, [vehicle type support](https://github.com/mapup/tollguru_vehicle_coverage/wiki/Vehicle-types-supported-by-TollGuru)
 * Car, SUV or Pickup truck. You can specify number of axles including axles in trailers
