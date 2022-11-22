@@ -3,11 +3,11 @@ Click on the folders above to see examples to extend mapping capabilities of Goo
 
 The toll information has following [key features](https://tollguru.com/developers/features):
 ### Support for [geographies](https://github.com/mapup/tollguru_country_coverage/wiki/Countries-supported-by-TollGuru) 
-* North America - Bahamas, Belize, Costa Rica, Cuba, Dominican Republic, El Salvador, Guatemala, Honduras, Jamaica, Nicaragua, Panama, Puerto Rico, United States of America
-* Europe - Albania, Andorra, Austria, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Croatia, Czechia, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Kosovo, Latvia, Liechtenstein, Lithuania, Luxembourg, Malta, Moldova, Monaco, Montenegro, Netherlands, North Macedonia, Norway, Poland, Portugal, Romania, Russia, San Marino, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, Ukraine, United Kingdom
+* North America - Bahamas, Belize, Canada, Costa Rica, Cuba, Dominican Republic, Guatemala, Honduras, Jamaica, Mexico, Panama, Puerto Rico, United States of America
+* Europe - Albania, Andorra, Austria, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Croatia, Czechia, Denmark, Estonia, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Moldova, Montenegro, Netherlands, North Macedonia, Norway, Poland, Portugal, Romania, Russia, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, United Kingdom
 * Australia - Australia, New Zealand
-* Asia - Bangladesh, India, Indonesia, Laos, Malaysia, Myanmar, Philipines, Singapore, Taiwan, Thailand, Vietnam
-* Latin America - Argentina, Bolivia, Brazil, Chile, Colombia, Ecuador, Falkland Islands, French Guiana, Guyana, Paraguay, Peru, Suriname, Uruguay, Venezuela
+* Asia - Brunei, India, Indonesia, Malaysia, Philippines, Singapore, Taiwan, Thailand, Vietnam
+* Latin America - Argentina, Bolivia, Brazil, Chile, Colombia, Ecuador, Guyana, Paraguay, Peru, Uruguay, Venezuela
 
 ### Based on vehicles in use in each country, [vehicle type support](https://github.com/mapup/tollguru_vehicle_coverage/wiki/Vehicle-types-supported-by-TollGuru)
 * Car, SUV or Pickup truck. You can specify number of axles including axles in trailers
