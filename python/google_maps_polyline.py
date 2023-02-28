@@ -6,9 +6,6 @@ import polyline as poly
 
 # Fetching API keys for google maps and TollGuru
 # API key for google map
-# We do not want the API key to be part of the code and therefore it #is an environment variable
-# You can use Google maps key
-# We will provide another TollGuru API key for India
 GOOGLE_MAPS_API_KEY = "GOOGLE_API_KEY"
 # API key for Tollguru
 TOLLGURU_API_KEY = "TOLLGURU_API_KEY"
