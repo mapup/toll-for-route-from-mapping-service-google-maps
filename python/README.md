@@ -27,27 +27,41 @@ The response includes *overview_polyline* which is an approximate (smoothed) pat
 We stitch the exact polyline for the whole route by piecing together polyline from each step using the code below.
 
 ```python
-import json
-import requests
-import os 
-import polyline as poly
+def get_polyline_from_google_maps(origin, destination, google_maps_api_key):
+    """
+    Fetching Polyline from Google for an origin and destination pair.
+    Parameters
+    ----------
+    source : str
+            Origin address
+    destination : str
+       Destination address
+    google_maps_api_key : str
+        Google map api key
+    Returns
+    -------
+    str - Google Polyline
+    """
+    # origin = "New York, NY"
+    # destination = "Dallas, Texas"
 
-#API key for google map
-token=os.environ.get('GOOGLE_API')
+    # Query Google maps with Key and Source-Destination coordinates
+    URL = f'https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&key={GOOGLE_MAPS_API_KEY}'
 
-def get_polyline_from_google_maps(source,destination):
-    #Query Google maps with Key and Source-Destination coordinates
-    url = 'https://maps.googleapis.com/maps/api/directions/json?origin={a}&destination={b}&key={c}'.format(a=source,b=destination,c=token)
-    #converting the response to json
-    response=requests.get(url).json()
-    #extracting segments of the routes
-    segments=response['routes'][0]['legs'][0]['steps']
-    #temp_list to store all coordinates
-    coordinate_list=[]
+    # converting the response to json
+# you should already have this code for Google maps so far.
+    response = requests.get(URL).json()
+# you will need the following code to get a polyline.
+    # extracting segments of the routes
+    segments = response['routes'][0]['legs'][0]['steps']
+# you cannot concatenate individual polylines. Instead we first need #to convert the individual polylines from each of the legs to
+# geo coordinates and then convert it one big polyline for the route #and send to TollGuru API for toll as response
+    # temp_list to store all coordinates
+    coordinate_list = []
     for i in segments:
         coordinate_list.extend(poly.decode(i['polyline']['points']))
-    polyline_from_google=poly.encode(coordinate_list)
-    return(polyline_from_google)
+    polyline_from_google = poly.encode(coordinate_list)
+    return (polyline_from_google)
 ```
 
 Note:
@@ -66,37 +80,34 @@ We need to send this route polyline to TollGuru API to receive toll information
 the last line can be changed to following
 
 ```python
-import json
-import requests
-import os 
-import polyline as poly
-
-#API key for google map
-token=os.environ.get('GOOGLE_API')
-#API key for Tollguru
-Tolls_Key = os.environ.get('Tollguru_API_New')
-
 def get_rates_from_tollguru(polyline):
-    #Tollguru querry url
-    Tolls_URL = 'https://dev.tollguru.com/v1/calc/route'
-    #Tollguru resquest parameters
+    # Tollguru query url
+    TollGuru_API_URL = 'https://prd.tollapi.tollguru.com/v2/polyline'
+
+    # polyline = get_polyline_from_google_maps(origin="New York, NY", destination='Dallas, TX',
+    #                                           google_maps_api_key=GOOGLE_MAPS_API_KEY())
+
+    # Tollguru request parameters
     headers = {
-                'Content-type': 'application/json',
-                'x-api-key': Tolls_Key
-                }
+        'Content-type': 'application/json',
+        'x-api-key': TOLLGURU_API_KEY
+    }
     params = {
-                #Explore https://tollguru.com/developers/docs/ to get best of all the parameter that tollguru has to offer 
-                'source': "google",
-                'polyline': polyline,                      # this is the encoded polyline that we made     
-                'vehicleType': '2AxlesAuto',                #'''Visit https://tollguru.com/developers/docs/#vehicle-types to know more options'''
-                'departure_time' : "2021-01-05T09:46:08Z"   #'''Visit https://en.wikipedia.org/wiki/Unix_time to know the time format'''
-                }
-    #Requesting Tollguru with parameters
-    response_tollguru= requests.post(Tolls_URL, json=params, headers=headers,timeout=200).json()
-    #print(response_tollguru)
-    #checking for errors or printing rates
-    if str(response_tollguru).find('message')==-1:
-        return(response_tollguru['route']['costs'])
+        # Explore https://tollguru.com/toll-api-docs to get best of all the parameter that tollguru has to offer
+        'source': "google",
+        # this is the encoded polyline that we made
+        'polyline': polyline,
+        'vehicleType': '2AxlesAuto',  # '''Visit https://tollguru.com/developers/docs/#vehicle-types to know more options'''
+        'departure_time': "2021-09-16T09:46:08Z"  # '''Visit https://en.wikipedia.org/wiki/Unix_time to know the time format'''
+    }
+    # Requesting Tollguru with parameters
+    response_tollguru = requests.post(TollGuru_API_URL,
+                                      json=params, headers=headers, timeout=200).json()
+
+    # print(response_tollguru)
+    # checking for errors or printing rates
+    if str(response_tollguru).find('message') == -1:
+        return (response_tollguru['route']['costs'])
     else:
         raise Exception(response_tollguru['message'])
 ```
