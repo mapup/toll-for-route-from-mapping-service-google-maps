@@ -1,5 +1,5 @@
 # toll-google-maps
-Calculate tolls for Google maps routes
+Calculate tolls for routes (polylines) from Google maps
 
 Click on the folders above to see examples to extend mapping capabilities of Google by adding toll information from [**TollGuru**](https://tollguru.com/) to the route information from Google.
 
