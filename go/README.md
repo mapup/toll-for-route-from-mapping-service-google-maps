@@ -127,7 +127,7 @@ We need to send this route polyline to TollGuru API to receive toll information
 
 ```go
 
-	url_tollguru := "https://dev.tollguru.com/v1/calc/route"
+	url_tollguru := "https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service"
 
 	requestBody, err := json.Marshal(map[string]string{
 		"source":         "google",

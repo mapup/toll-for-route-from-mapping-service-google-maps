@@ -66,7 +66,7 @@ the last line can be changed to following
 
 ```ruby
 # Sending POST request to TollGuru
-TOLLGURU_URL = 'https://dev.tollguru.com/v1/calc/route'
+TOLLGURU_URL = 'https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service'
 TOLLGURU_KEY = ENV['TOLLGURU_KEY']
 headers = {'content-type' => 'application/json', 'x-api-key' => TOLLGURU_KEY}
 body = {'source' => "google", 'polyline' => google_encoded_polyline, 'vehicleType' => "2AxlesAuto", 'departure_time' => "2021-01-05T09:46:08Z"}

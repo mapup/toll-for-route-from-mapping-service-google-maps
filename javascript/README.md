@@ -88,7 +88,7 @@ the last line can be changed to following
 
 ```javascript
 
-const tollguruUrl = 'https://dev.tollguru.com/v1/calc/route';
+const tollguruUrl = 'https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service';
 
 const handleRoute = (e, r, body) =>  {
 

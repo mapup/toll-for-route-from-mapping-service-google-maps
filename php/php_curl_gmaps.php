@@ -52,7 +52,7 @@ $postdata = array(
 $encode_postData = json_encode($postdata);
 
 curl_setopt_array($curl, array(
-CURLOPT_URL => "https://dev.tollguru.com/v1/calc/route",
+CURLOPT_URL => "https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service",
 CURLOPT_RETURNTRANSFER => true,
 CURLOPT_ENCODING => "",
 CURLOPT_MAXREDIRS => 10,

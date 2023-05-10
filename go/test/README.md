@@ -146,7 +146,7 @@ Note: We have append all the polylines and then decode them followed by encoding
 
 // Tollguru API request
 
-	url_tollguru := "https://dev.tollguru.com/v1/calc/route"
+	url_tollguru := "https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service"
 
 
 	requestBody, err := json.Marshal(map[string]string{

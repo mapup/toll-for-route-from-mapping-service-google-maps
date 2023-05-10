@@ -21,7 +21,7 @@ def get_toll_rate(source_val,dest_val)
     google_encoded_polyline = FastPolylines.encode(coord_decoded)
 
     # Sending POST request to TollGuru
-    tollguru_url = 'https://dev.tollguru.com/v1/calc/route'
+    tollguru_url = 'https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service'
     tollguru_key = ENV['TOLLGURU_KEY']
     headers = {'content-type' => 'application/json', 'x-api-key' => tollguru_key}
     body = {'source' => "google", 'polyline' => google_encoded_polyline, 'vehicleType' => "2AxlesAuto", 'departure_time' => "2020-07-02T05:31:06Z"}

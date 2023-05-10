@@ -32,7 +32,7 @@ const getRoute = (cb) => request.get(url, cb);
 //const handleRoute = (e, r, body) => console.log(getPolyline(body))
 //getRoute(handleRoute)
 
-const tollguruUrl = 'https://dev.tollguru.com/v1/calc/route';
+const tollguruUrl = 'https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service';
 
 const handleRoute = (e, r, body) =>  {
 

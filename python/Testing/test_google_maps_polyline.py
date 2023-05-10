@@ -30,7 +30,7 @@ def get_polyline_from_google_maps(source,destination):
 '''Calling Tollguru API'''
 def get_rates_from_tollguru(polyline):
     #Tollguru querry url
-    Tolls_URL = 'https://dev.tollguru.com/v1/calc/route'
+    Tolls_URL = 'https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service'
     #Tollguru resquest parameters
     headers = {
                 'Content-type': 'application/json',
