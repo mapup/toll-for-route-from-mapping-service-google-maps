@@ -1,18 +1,16 @@
 const request = require("request");
 const polyline = require("polyline");
 
-// REST API key from MapmyIndia
-const key = process.env.GOOGLE_MAPS_API_KEY;
-const tollguruKey = process.env.TOLLGURU_KEY;
+const GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json";
+const GMAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+
+const TOLLGURU_API_KEY = process.env.TOLLGURU_API_KEY;
+const TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2";
+const POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service";
 
 const source = 'Dallas, TX'
-
 const destination = 'New York, NY';
 
-const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${source}&destination=${destination}&key=${key}`;
-
-
-const head = arr => arr[0];
 const flatten = (arr, x) => arr.concat(x);
 
 // JSON path "$..points"
@@ -27,14 +25,11 @@ const getPoints = body => body.routes
 
 const getPolyline = body => polyline.encode(getPoints(JSON.parse(body)));
 
-const getRoute = (cb) => request.get(url, cb);
+const getRoute = (cb) => request.get(`${GMAPS_API_URL}?origin=${source}&destination=${destination}&key=${GMAPS_API_KEY}`, cb);
 
-//const handleRoute = (e, r, body) => console.log(getPolyline(body))
-//getRoute(handleRoute)
+const tollguruUrl = `${TOLLGURU_API_URL}/${POLYLINE_ENDPOINT}`;
 
-const tollguruUrl = 'https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service';
-
-const handleRoute = (e, r, body) =>  {
+const handleRoute = (e, r, body) => {
 
   console.log(body);
   const _polyline = getPolyline(body);
@@ -45,7 +40,7 @@ const handleRoute = (e, r, body) =>  {
       url: tollguruUrl,
       headers: {
         'content-type': 'application/json',
-        'x-api-key': tollguruKey
+        'x-api-key': TOLLGURU_API_KEY
       },
       body: JSON.stringify({ source: "google", polyline: _polyline })
     },

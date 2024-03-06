@@ -1,40 +1,44 @@
 <?php
 //using googlemaps API
 
+$GMAPS_API_KEY = getenv('GMAPS_API_KEY');
+$GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json";
+
+$TOLLGURU_API_KEY = getenv('TOLLGURU_API_KEY');
+$TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2";
+$POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service";
+
 //from & to location..
-function getPolyline($from, $to){
+function getPolyline($from, $to) {
+  global $GMAPS_API_KEY, $GMAPS_API_URL;
 
-$key = 'google.api.key';
+  //connection..
+  $ggle = curl_init();
 
-$url = 'https://maps.googleapis.com/maps/api/directions/json?origin='.urlencode($from).'&destination='.urlencode($to).'&key='.$key.'';
+  curl_setopt($ggle, CURLOPT_SSL_VERIFYHOST, false);
+  curl_setopt($ggle, CURLOPT_SSL_VERIFYPEER, false);
 
-//connection..
-$ggle = curl_init();
+  curl_setopt($ggle, CURLOPT_URL, $GMAPS_API_URL.'?origin='.urlencode($from).'&destination='.urlencode($to).'&key='.$GMAPS_API_KEY.'');
+  curl_setopt($ggle, CURLOPT_RETURNTRANSFER, true);
 
-curl_setopt($ggle, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($ggle, CURLOPT_SSL_VERIFYPEER, false);
+  //getting response from googleapis..
+  $response = curl_exec($ggle);
+  $err = curl_error($ggle);
 
-curl_setopt($ggle, CURLOPT_URL, $url);
-curl_setopt($ggle, CURLOPT_RETURNTRANSFER, true);
+  curl_close($ggle);
 
-//getting response from googleapis..
-$response = curl_exec($ggle);
-$err = curl_error($ggle);
+  if ($err) {
+    echo "cURL Error #:" . $err;
+  } else {
+    echo "200 : OK\n";
+  }
 
-curl_close($ggle);
+  //extracting polyline from the JSON response..
+  $data_gmaps = json_decode($response, true);
+  //polyline..
+  $polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
 
-if ($err) {
-	  echo "cURL Error #:" . $err;
-} else {
-	  echo "200 : OK\n";
-}
-
-//extracting polyline from the JSON response..
-$data_gmaps = json_decode($response, true);
-//polyline..
-$polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
-
-return $polyline_gmaps;
+  return $polyline_gmaps;
 }
 
 //calling getPolyline function
@@ -59,20 +63,20 @@ $postdata = array(
 $encode_postData = json_encode($postdata);
 
 curl_setopt_array($curl, array(
-CURLOPT_URL => "https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service",
-CURLOPT_RETURNTRANSFER => true,
-CURLOPT_ENCODING => "",
-CURLOPT_MAXREDIRS => 10,
-CURLOPT_TIMEOUT => 30,
-CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_URL => $TOLLGURU_API_URL . "/" . $POLYLINE_ENDPOINT,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
 
 
-//sending gmaps polyline to tollguru
-CURLOPT_POSTFIELDS => $encode_postData,
-CURLOPT_HTTPHEADER => array(
-				      "content-type: application/json",
-				      "x-api-key: tollguru.api.key"),
+  //sending gmaps polyline to tollguru
+  CURLOPT_POSTFIELDS => $encode_postData,
+  CURLOPT_HTTPHEADER => array(
+    "content-type: application/json",
+    "x-api-key: " . $TOLLGURU_API_KEY),
 ));
 
 $response = curl_exec($curl);
