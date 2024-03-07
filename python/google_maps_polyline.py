@@ -5,14 +5,23 @@ import json
 import polyline as poly
 
 GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json"
-GMAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+GMAPS_API_KEY = os.environ.get("GMAPS_API_KEY")
 
 TOLLGURU_API_KEY = os.environ.get("TOLLGURU_API_KEY")
 TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2"
 POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service"
 
-source = "Dallas, TX"
+source = "Philadelphia, PA"
 destination = "New York, NY"
+
+# Explore https://tollguru.com/toll-api-docs to get best of all the parameter that tollguru has to offer
+request_parameters = {
+    "vehicle": {
+        "type": "2AxlesAuto",
+    },
+    # Visit https://en.wikipedia.org/wiki/Unix_time to know the time format
+    "departure_time": "2021-01-05T09:46:08Z",
+}
 
 
 def get_polyline_from_google_maps(origin, destination):
@@ -55,18 +64,13 @@ def get_polyline_from_google_maps(origin, destination):
 
 
 # you send this polyline and receive tolls using following code
-
-
 def get_rates_from_tollguru(polyline):
     # Tollguru request parameters
     headers = {"Content-type": "application/json", "x-api-key": TOLLGURU_API_KEY}
     params = {
-        # Explore https://tollguru.com/toll-api-docs to get best of all the parameter that tollguru has to offer
+        **request_parameters,
         "source": "google",
-        # this is the encoded polyline that we made
-        "polyline": polyline,
-        "vehicleType": "2AxlesAuto",  # '''Visit https://tollguru.com/developers/docs/#vehicle-types to know more options'''
-        "departure_time": "2021-09-16T09:46:08Z",  # '''Visit https://en.wikipedia.org/wiki/Unix_time to know the time format'''
+        "polyline": polyline,  # this is the encoded polyline that we made
     }
     # Requesting Tollguru with parameters
     response_tollguru = requests.post(

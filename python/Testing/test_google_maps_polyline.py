@@ -4,17 +4,26 @@ import requests
 import os
 import polyline as poly
 
-GMAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+GMAPS_API_KEY = os.environ.get("GMAPS_API_KEY")
 GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json"
 
 TOLLGURU_API_KEY = os.environ.get("TOLLGURU_API_KEY")
 TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2"
 POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service"
 
-"""Fetching Polyline from Google"""
+# Explore https://tollguru.com/toll-api-docs to get best of all the parameter that tollguru has to offer
+request_parameters = {
+    "vehicle": {
+        "type": "2AxlesAuto",
+    },
+    # Visit https://en.wikipedia.org/wiki/Unix_time to know the time format
+    "departure_time": "2021-01-05T09:46:08Z",
+}
 
 
 def get_polyline_from_google_maps(source, destination):
+    """Fetching Polyline from Google"""
+
     # Query Google maps with Key and Source-Destination coordinates
     url = (
         f"{GMAPS_API_URL}?origin={source}&destination={destination}&key={GMAPS_API_KEY}"
@@ -31,22 +40,22 @@ def get_polyline_from_google_maps(source, destination):
     return polyline_from_google
 
 
-"""Calling Tollguru API"""
-
-
 def get_rates_from_tollguru(polyline):
+    """Calling Tollguru API"""
+
     # Tollguru resquest parameters
     headers = {"Content-type": "application/json", "x-api-key": TOLLGURU_API_KEY}
     params = {
-        # Explore https://tollguru.com/developers/docs/ to get best of all the parameter that tollguru has to offer
+        **request_parameters,
         "source": "google",
         "polyline": polyline,  # this is the encoded polyline that we made
-        "vehicleType": "2AxlesAuto",  #'''Visit https://tollguru.com/developers/docs/#vehicle-types to know more options'''
-        "departure_time": "2021-01-05T09:46:08Z",  #'''Visit https://en.wikipedia.org/wiki/Unix_time to know the time format'''
     }
     # Requesting Tollguru with parameters
     response_tollguru = requests.post(
-        f"{TOLLGURU_API_URL}/{POLYLINE_ENDPOINT}", json=params, headers=headers, timeout=200
+        f"{TOLLGURU_API_URL}/{POLYLINE_ENDPOINT}",
+        json=params,
+        headers=headers,
+        timeout=200,
     ).json()
     # print(response_tollguru)
     # checking for errors or printing rates

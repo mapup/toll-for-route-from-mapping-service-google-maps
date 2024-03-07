@@ -2,14 +2,23 @@ const request = require("request");
 const polyline = require("polyline");
 
 const GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json";
-const GMAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+const GMAPS_API_KEY = process.env.GMAPS_API_KEY;
 
 const TOLLGURU_API_KEY = process.env.TOLLGURU_API_KEY;
 const TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2";
 const POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service";
 
-const source = 'Dallas, TX'
+const source = 'Philadelphia, PA'
 const destination = 'New York, NY';
+
+// Explore https://tollguru.com/toll-api-docs to get the best of all the parameters that tollguru has to offer
+const requestParameters = {
+  "vehicle": {
+    "type": "2AxlesAuto",
+  },
+  // Visit https://en.wikipedia.org/wiki/Unix_time to know the time format
+  "departure_time": "2021-01-05T09:46:08Z",
+}
 
 const flatten = (arr, x) => arr.concat(x);
 
@@ -25,7 +34,11 @@ const getPoints = body => body.routes
 
 const getPolyline = body => polyline.encode(getPoints(JSON.parse(body)));
 
-const getRoute = (cb) => request.get(`${GMAPS_API_URL}?origin=${source}&destination=${destination}&key=${GMAPS_API_KEY}`, cb);
+const getRoute = (cb) => request.get(`${GMAPS_API_URL}?${new URLSearchParams({
+  origin: source,
+  destination: destination,
+  key: GMAPS_API_KEY
+}).toString()}`, cb);
 
 const tollguruUrl = `${TOLLGURU_API_URL}/${POLYLINE_ENDPOINT}`;
 
@@ -42,7 +55,11 @@ const handleRoute = (e, r, body) => {
         'content-type': 'application/json',
         'x-api-key': TOLLGURU_API_KEY
       },
-      body: JSON.stringify({ source: "google", polyline: _polyline })
+      body: JSON.stringify({
+        source: "google",
+        polyline: _polyline,
+        ...requestParameters,
+      })
     },
     (e, r, body) => {
       console.log(e);
