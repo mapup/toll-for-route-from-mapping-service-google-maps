@@ -40,10 +40,4 @@ Support for barrier, ticket system and distance based tolling configurations
 ### Support for trucks based on [height, weight, harardous goods, etc.](https://github.com/mapup/toll-google-maps/wiki/4.-Truck-parameters-supported-by-TollGuru)
 You can receive tolls based on vehicle height, weight etc., while calculating toll: "truckType","shippedHazardousGoods","tunnelCategory","truckRestrictionPenalty" and [more](https://github.com/mapup/toll-google-maps/wiki/4.-Truck-parameters-supported-by-TollGuru).
 
-
-
-
-
-
-
-
+For more examples of the different ways in which the responses from this endpoint can be configured, you can refer to: [Our API parameter examples repository.](https://github.com/mapup/tollguru-api-parameter-examples/tree/main/request-bodies/02-Complete-Polyline-To-Toll)
