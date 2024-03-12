@@ -78,7 +78,6 @@ def get_rates_from_tollguru(polyline):
         timeout=200,
     ).json()
 
-    # print(response_tollguru)
     # checking for errors or printing rates
     if str(response_tollguru).find("message") == -1:
         return response_tollguru["route"]["costs"]
