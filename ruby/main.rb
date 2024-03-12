@@ -10,6 +10,7 @@ TOLLGURU_API_KEY = ENV["TOLLGURU_API_KEY"]
 TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2"
 POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service"
 
+# From and To locations
 source = 'Philadelphia, PA'
 destination = 'New York, NY'
 
@@ -39,4 +40,5 @@ body = {
   'polyline': google_encoded_polyline,
   **request_parameters,
 }
+
 tollguru_response = HTTParty.post(TOLLGURU_URL,:body => body.to_json, :headers => headers, :timeout => 60)

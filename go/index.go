@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"os"
 	"time"
-  "net/url"
+  	"net/url"
 )
 
 
@@ -146,8 +146,8 @@ func main() {
 
 	toll := cost["route"].(map[string]interface{})["costs"].(map[string]interface{})["tag"]
 	fmt.Printf("The toll rate is: %v", toll)
-
 }
+
 func DecodePolyline(poly string) []LatLng {
 	p := &Polyline{
 		Points: poly,

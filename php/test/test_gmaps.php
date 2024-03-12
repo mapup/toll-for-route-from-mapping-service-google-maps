@@ -1,5 +1,5 @@
 <?php
-//using googlemaps API
+// Using GoogleMaps API
 
 $GMAPS_API_KEY = getenv('GMAPS_API_KEY');
 $GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json";
@@ -17,11 +17,11 @@ $request_parameters = array(
   "departure_time" => "2021-01-05T09:46:08Z",
 );
 
-//from & to location..
+// From and To locations
 function getPolyline($from, $to) {
   global $GMAPS_API_KEY, $GMAPS_API_URL;
 
-  //connection..
+  // Connection
   $ggle = curl_init();
 
   curl_setopt($ggle, CURLOPT_SSL_VERIFYHOST, false);
@@ -30,7 +30,7 @@ function getPolyline($from, $to) {
   curl_setopt($ggle, CURLOPT_URL, $GMAPS_API_URL.'?origin='.urlencode($from).'&destination='.urlencode($to).'&key='.$GMAPS_API_KEY.'');
   curl_setopt($ggle, CURLOPT_RETURNTRANSFER, true);
 
-  //getting response from googleapis..
+  // Getting response from Google API
   $response = curl_exec($ggle);
   $err = curl_error($ggle);
 
@@ -42,7 +42,7 @@ function getPolyline($from, $to) {
     echo "200 : OK\n";
   }
 
-  //extracting polyline from the JSON response..
+  // Extracting polyline from the JSON response
   $data_gmaps = json_decode($response, true);
   //polyline..
   $polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
@@ -50,13 +50,13 @@ function getPolyline($from, $to) {
   return $polyline_gmaps;
 }
 
-//calling getPolyline function
-//testing starts here...
+// Calling getPolyline function
+// Testing starts here
 require_once(__DIR__.'/test_location.php');
 foreach ($locdata as $item) {
   $polyline_gmaps = getPolyline($item['from'], $item['to']);
 
-  //using tollguru API..
+  // Using tollguru API
   $curl = curl_init();
 
   curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -69,7 +69,7 @@ foreach ($locdata as $item) {
     ...$request_parameters
   );
 
-  //json encoding source and polyline to send as postfields..
+  // JSON encoding source and polyline to send as postfields
   $encode_postData = json_encode($postdata);
 
   curl_setopt_array($curl, array(
@@ -82,7 +82,7 @@ foreach ($locdata as $item) {
     CURLOPT_CUSTOMREQUEST => "POST",
 
 
-    //sending gmaps polyline to tollguru
+    // Sending GMaps polyline to TollGuru
     CURLOPT_POSTFIELDS => $encode_postData,
     CURLOPT_HTTPHEADER => array(
       "content-type: application/json",
@@ -100,7 +100,7 @@ foreach ($locdata as $item) {
     echo "200 : OK\n";
   }
 
-  //response from tollguru..
+  // Response from TollGuru
   $data = json_decode($response, true);
 
   $tag = $data['route']['costs']['tag'];

@@ -1,5 +1,5 @@
 <?php
-//using googlemaps API
+// Using GoogleMaps API
 
 $GMAPS_API_KEY = getenv('GMAPS_API_KEY');
 $GMAPS_API_URL = "https://maps.googleapis.com/maps/api/directions/json";
@@ -8,7 +8,7 @@ $TOLLGURU_API_KEY = getenv('TOLLGURU_API_KEY');
 $TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2";
 $POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service";
 
-// from & to location..
+// From & To locations
 $source = 'Philadelphia, PA';
 $destination = 'New York, NY';
 
@@ -21,7 +21,7 @@ $request_parameters = array(
     "departure_time" => "2021-01-05T09:46:08Z",
 );
 
-//connection..
+// Connection
 $ggle = curl_init();
 
 curl_setopt($ggle, CURLOPT_SSL_VERIFYHOST, false);
@@ -30,7 +30,7 @@ curl_setopt($ggle, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ggle, CURLOPT_URL, $GMAPS_API_URL.'?origin='.urlencode($source).'&destination='.urlencode($destination).'&key='.$GMAPS_API_KEY.'');
 curl_setopt($ggle, CURLOPT_RETURNTRANSFER, true);
 
-//getting response from googleapis..
+// Getting response from Google API
 $response = curl_exec($ggle);
 $err = curl_error($ggle);
 
@@ -42,14 +42,14 @@ if ($err) {
   echo "200 : OK\n";
 }
 
-//extracting polyline from the JSON response..
+// Extracting polyline from the JSON response
 $data_gmaps = json_decode($response, true);
 
-//polyline..
+// Polyline
 $polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
 
 
-//using tollguru API..
+// Using TollGuru API
 $curl = curl_init();
 
 curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -62,7 +62,7 @@ $postdata = array(
   ...$request_parameters,
 );
 
-//json encoding source and polyline to send as postfields..
+// JSON encoding source and polyline to send as postfields
 $encode_postData = json_encode($postdata);
 
 curl_setopt_array($curl, array(
@@ -74,7 +74,7 @@ curl_setopt_array($curl, array(
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "POST",
 
-  //sending gmaps polyline to tollguru
+  // Sending GMaps polyline to TollGuru
   CURLOPT_POSTFIELDS => $encode_postData,
   CURLOPT_HTTPHEADER => array(
     "content-type: application/json",
@@ -92,7 +92,7 @@ if ($err) {
   echo "200 : OK\n";
 }
 
-//response from tollguru..
+// Response from TollGuru
 $data = var_dump(json_decode($response, true));
 print_r($data);
 ?>

@@ -11,6 +11,7 @@ TOLLGURU_API_KEY = os.environ.get("TOLLGURU_API_KEY")
 TOLLGURU_API_URL = "https://apis.tollguru.com/toll/v2"
 POLYLINE_ENDPOINT = "complete-polyline-from-mapping-service"
 
+# From and To locations
 source = "Philadelphia, PA"
 destination = "New York, NY"
 
@@ -22,7 +23,6 @@ request_parameters = {
     # Visit https://en.wikipedia.org/wiki/Unix_time to know the time format
     "departure_time": "2021-01-05T09:46:08Z",
 }
-
 
 def get_polyline_from_google_maps(origin, destination):
     """
@@ -39,8 +39,6 @@ def get_polyline_from_google_maps(origin, destination):
     -------
     str - Google Polyline
     """
-    # origin = "New York, NY"
-    # destination = "Dallas, Texas"
 
     # Query Google maps with Key and Source-Destination coordinates
     URL = (
@@ -80,13 +78,11 @@ def get_rates_from_tollguru(polyline):
         timeout=200,
     ).json()
 
-    # print(response_tollguru)
     # checking for errors or printing rates
     if str(response_tollguru).find("message") == -1:
         return response_tollguru["route"]["costs"]
     else:
         raise Exception(response_tollguru["message"])
-
 
 if __name__ == "__main__":
     # Step 1 : Get Polyline from Google
