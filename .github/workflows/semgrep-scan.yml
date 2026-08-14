@@ -5,8 +5,8 @@
 #
 # Required secrets (set once at the ORG level, access: all repositories,
 # so every repo inherits them — or per repo if org secrets can't be used):
-#   SEMGREP_WEBAPP_URL - the Apps Script web app /exec URL (see Code.gs)
-#   SEMGREP_TOKEN      - the token printed by the script's setup() function
+#   SEMGREP_SHEET_URL   - the Apps Script web app /exec URL (see Code.gs)
+#   SEMGREP_SHEET_TOKEN - the token printed by the script's setup() function
 #
 # Repo ownership lives in the sheet's "Owners" tab — edit it there.
 
@@ -72,15 +72,15 @@ jobs:
 
       - name: Report to Google Sheet
         env:
-          WEBAPP_URL: ${{ secrets.SEMGREP_WEBAPP_URL }}
-          TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+          WEBAPP_URL: ${{ secrets.SEMGREP_SHEET_URL }}
+          TOKEN: ${{ secrets.SEMGREP_SHEET_TOKEN }}
           REPO_FULL: ${{ github.repository }}
           BRANCH: ${{ steps.branch.outputs.name }}
           TRIGGER: ${{ github.event_name }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [ -z "$WEBAPP_URL" ] || [ -z "$TOKEN" ]; then
-            echo "::error::SEMGREP_WEBAPP_URL / SEMGREP_TOKEN secrets are not visible to this repo — check the org secrets' names and 'Repository access' setting, or add them as repo-level secrets."
+            echo "::error::SEMGREP_SHEET_URL / SEMGREP_SHEET_TOKEN secrets are not visible to this repo — check the org secrets' names and 'Repository access' setting, or add them as repo-level secrets."
             exit 1
           fi
 
