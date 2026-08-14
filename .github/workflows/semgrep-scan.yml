@@ -16,9 +16,9 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "Branch to scan"
+        description: "Branch to scan (leave empty = repo's default branch)"
         required: false
-        default: "main"
+        default: ""
   schedule:
     - cron: "0 */3 * * *" # every 3 hours (UTC); use "0 */2 * * *" for every 2
 
@@ -38,10 +38,10 @@ jobs:
       - name: Resolve branch
         id: branch
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            BRANCH="${{ github.event.inputs.branch }}"
-          else
-            # scheduled runs always execute on the default branch
+          BRANCH="${{ github.event.inputs.branch }}"
+          if [ -z "$BRANCH" ]; then
+            # Empty input or scheduled run: scan the branch this workflow
+            # runs on — the repo's default branch unless chosen otherwise.
             BRANCH="${{ github.ref_name }}"
           fi
           echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
