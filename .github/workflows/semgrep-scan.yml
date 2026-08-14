@@ -3,12 +3,10 @@
 # Copy this file to .github/workflows/semgrep-scan.yml in each repo (on the
 # default branch — the schedule trigger only fires from there).
 #
-# NOTE: the webhook URL and token are embedded below (no GitHub secrets
-# needed). The token only allows writing rows to the dashboard — it cannot
-# read anything. Keep this file out of PUBLIC repos, and to rotate the token
-# (Apps Script: clear the TOKEN script property, re-run setup()) this file
-# must be updated in every repo. The semgrep step excludes this file from
-# its own scan so the embedded token is not reported as a finding.
+# Required secrets (set once at the ORG level, access: all repositories,
+# so every repo inherits them — or per repo if org secrets can't be used):
+#   SEMGREP_WEBAPP_URL - the Apps Script web app /exec URL (see Code.gs)
+#   SEMGREP_TOKEN      - the token printed by the script's setup() function
 #
 # Repo ownership lives in the sheet's "Owners" tab — edit it there.
 
@@ -64,11 +62,7 @@ jobs:
       - name: Run semgrep
         # --config auto picks rules based on the languages it detects.
         # To pin rulesets instead: --config p/ci --config p/secrets
-        # --exclude keeps this workflow's embedded webhook token from being
-        # flagged by generic hardcoded-secret rules on every scan.
-        run: >
-          semgrep scan --config auto --exclude semgrep-scan.yml
-          --json --output semgrep-results.json
+        run: semgrep scan --config auto --json --output semgrep-results.json
 
       - name: Upload raw results
         uses: actions/upload-artifact@v4
@@ -78,13 +72,18 @@ jobs:
 
       - name: Report to Google Sheet
         env:
-          WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzrpcwODsMo1NLfL7-5_lr9np3qw3xC3PBZEBgq59yuOeQMR3IIV4Ue8gfkcLO2HdC-/exec"
-          TOKEN: "3bcb44b1-8e3d-4c4a-a96e-d1b9a7c7b35a"
+          WEBAPP_URL: ${{ secrets.SEMGREP_WEBAPP_URL }}
+          TOKEN: ${{ secrets.SEMGREP_TOKEN }}
           REPO_FULL: ${{ github.repository }}
           BRANCH: ${{ steps.branch.outputs.name }}
           TRIGGER: ${{ github.event_name }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          if [ -z "$WEBAPP_URL" ] || [ -z "$TOKEN" ]; then
+            echo "::error::SEMGREP_WEBAPP_URL / SEMGREP_TOKEN secrets are not visible to this repo — check the org secrets' names and 'Repository access' setting, or add them as repo-level secrets."
+            exit 1
+          fi
+
           python3 - <<'PY'
           import json
           import os
