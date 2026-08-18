@@ -78,8 +78,8 @@ jobs:
 
       - name: Report to Google Sheet
         env:
-          WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzrpcwODsMo1NLfL7-5_lr9np3qw3xC3PBZEBgq59yuOeQMR3IIV4Ue8gfkcLO2HdC-/exec"
-          TOKEN: "3bcb44b1-8e3d-4c4a-a96e-d1b9a7c7b35a"
+          WEBAPP_URL: ${{ secrets.SEMGREP_SHEET_URL }}
+          TOKEN: ${{ secrets.SEMGREP_SHEET_TOKEN }}
           REPO_FULL: ${{ github.repository }}
           BRANCH: ${{ steps.branch.outputs.name }}
           TRIGGER: ${{ github.event_name }}
