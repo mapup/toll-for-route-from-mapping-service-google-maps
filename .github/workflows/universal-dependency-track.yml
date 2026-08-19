@@ -1,0 +1,187 @@
+name: Dependency Track SBOM Scan
+
+# PORTABLE TEMPLATE — copy into
+# <your-repo>/.github/workflows/universal-dependency-track.yml as-is;
+# nothing repo-specific in it. Identical to
+# mapup-security-team/.github/workflows/universal-dependency-track.yml.
+#
+# Covers TWO of the org's tracked tools in one file: Trivy (generates the
+# CycloneDX SBOM in license mode) and Dependency-Track (receives it).
+#
+# Required secret: DEPENDENCYTRACK_API_KEY
+
+on:
+  # No branch filters: repos differ in default-branch names. Pushes are
+  # gated to the repo's actual default branch by the job-level `if` below
+  # (GitHub trigger filters can't express "the default branch" dynamically);
+  # PRs into any branch are scanned.
+  push:
+  pull_request:
+  schedule:
+    # Run daily at 9am UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  dependency-scan:
+    # Only default-branch pushes produce the canonical 'main' SBOM upload —
+    # feature-branch pushes are skipped rather than overwriting it.
+    if: github.event_name != 'push' || github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (if needed)
+        if: hashFiles('**/package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Python (if needed)
+        if: hashFiles('**/requirements.txt', '**/pyproject.toml', '**/setup.py') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Setup Go (if needed)
+        if: hashFiles('**/go.mod') != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Setup Java (if needed)
+        if: hashFiles('**/pom.xml', '**/build.gradle', '**/build.gradle.kts') != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies (all languages, including monorepos)
+        run: |
+          echo "🔍 Detecting and installing dependencies..."
+
+          # Install pnpm if any pnpm-lock.yaml exists (needed for mixed monorepos)
+          if find . -name "pnpm-lock.yaml" -not -path "*/node_modules/*" | grep -q .; then
+            echo "📦 Installing pnpm globally (detected pnpm projects)"
+            npm install -g pnpm
+          fi
+
+          # Node.js: Check root first for workspace-level install
+          if [ -f "pnpm-lock.yaml" ]; then
+            echo "📦 Detected pnpm workspace at root"
+            pnpm install --no-frozen-lockfile --ignore-scripts 2>/dev/null || echo "Note: pnpm install failed, continuing..."
+          elif [ -f "yarn.lock" ]; then
+            echo "📦 Detected yarn workspace at root"
+            yarn install --ignore-scripts 2>/dev/null || echo "Note: yarn install failed, continuing..."
+          elif [ -f "package-lock.json" ]; then
+            echo "📦 Found npm project at root"
+            npm ci 2>/dev/null || npm install 2>/dev/null || echo "Note: npm install failed, continuing..."
+          elif [ -f "package.json" ]; then
+            echo "📦 Found Node.js project at root (no lock file)"
+            npm install --package-lock-only 2>/dev/null || echo "Note: npm install failed, continuing..."
+          fi
+
+          # Find all subdirectories and install based on their lock files (for mixed monorepos)
+          find . -type d -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "." | while read -r dir; do
+            if [ -f "$dir/pnpm-lock.yaml" ]; then
+              echo "📦 Found pnpm project in: $dir"
+              (cd "$dir" && pnpm install --no-frozen-lockfile --ignore-scripts 2>/dev/null || echo "Note: pnpm install failed in $dir")
+            elif [ -f "$dir/yarn.lock" ]; then
+              echo "📦 Found yarn project in: $dir"
+              (cd "$dir" && yarn install --ignore-scripts 2>/dev/null || echo "Note: yarn install failed in $dir")
+            elif [ -f "$dir/package-lock.json" ]; then
+              echo "📦 Found npm project in: $dir"
+              (cd "$dir" && (npm ci 2>/dev/null || npm install 2>/dev/null || echo "Note: npm install failed in $dir"))
+            elif [ -f "$dir/package.json" ]; then
+              echo "📦 Found Node.js project in: $dir (no lock file)"
+              (cd "$dir" && npm install --package-lock-only 2>/dev/null || echo "Note: npm install failed in $dir")
+            fi
+          done
+
+          # Python projects
+          find . -name "requirements.txt" -not -path "*/.git/*" -not -path "*/venv/*" | while read -r req; do
+            dir=$(dirname "$req")
+            echo "🐍 Found Python project in: $dir"
+            (cd "$dir" && pip install -r requirements.txt 2>/dev/null || echo "Note: pip install failed in $dir")
+          done
+
+          # Go projects
+          find . -name "go.mod" -not -path "*/.git/*" | while read -r gomod; do
+            dir=$(dirname "$gomod")
+            echo "🔷 Found Go project in: $dir"
+            (cd "$dir" && go mod download 2>/dev/null || echo "Note: go mod download failed in $dir")
+          done
+
+          # Java/Maven projects
+          find . -name "pom.xml" -not -path "*/.git/*" | while read -r pom; do
+            dir=$(dirname "$pom")
+            echo "☕ Found Maven project in: $dir"
+            (cd "$dir" && mvn dependency:resolve 2>/dev/null || echo "Note: mvn dependency:resolve failed in $dir")
+          done
+
+          # Java/Gradle projects
+          find . -name "build.gradle*" -not -path "*/.git/*" | while read -r gradle; do
+            dir=$(dirname "$gradle")
+            echo "☕ Found Gradle project in: $dir"
+            (cd "$dir" && (./gradlew dependencies 2>/dev/null || gradle dependencies 2>/dev/null || echo "Note: gradle dependencies failed in $dir"))
+          done
+
+          echo "✅ Dependency installation complete"
+        continue-on-error: true
+
+      - name: Generate SBOM with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          format: cyclonedx
+          output: bom-raw.json
+          scanners: license
+          license-full: true
+
+      - name: Clean and validate SBOM
+        run: |
+          echo "🧹 Cleaning SBOM (removing lock files and false positives)..."
+          cat bom-raw.json | jq '
+            .components |= map(select(
+              .name != "package-lock.json" and
+              .name != "yarn.lock" and
+              .name != "pnpm-lock.yaml" and
+              .name != "go.mod" and
+              .name != "go.sum" and
+              .name != "uv.lock" and
+              .name != "poetry.lock" and
+              .name != "Pipfile.lock" and
+              .name != "Cargo.lock" and
+              .name != "composer.lock" and
+              (.name | test(".*lock\\.json$") | not)
+            ))
+          ' > bom.json
+
+          echo ""
+          echo "📊 SBOM Statistics:"
+          cat bom.json | jq '{
+              totalComponents: (.components | length),
+              componentsWithLicenses: ([.components[] | select(.licenses)] | length)
+          }'
+
+      - name: Upload BOM to Dependency-Track
+        uses: DependencyTrack/gh-upload-sbom@v3
+        with:
+          serverhostname: '44.194.0.211'
+          port: '8091'
+          protocol: 'http'
+          apikey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+          projectname: ${{ github.event.repository.name }}
+          projectversion: 'main'
+          bomfilename: 'bom.json'
+          autocreate: 'true'
+
+      - name: Archive SBOM artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sbom-cyclonedx
+          path: bom.json
+          retention-days: 90

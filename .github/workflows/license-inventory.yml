@@ -1,0 +1,120 @@
+name: License Inventory (npm / Go / Python)
+
+# PORTABLE TEMPLATE — copy into
+# <your-repo>/.github/workflows/license-inventory.yml as-is. Adapted from
+# mapup-security-team/.github/workflows/license-inventory.yml (Google Chat
+# alert is an inline curl here instead of that repo's local helper script).
+#
+# Per-ecosystem license inventory per runbook §7.1 — lighter-weight
+# "inventory aids" than ScanCode's source-level deep pass, reading package
+# manifests rather than scanning file contents. Pinned installs, not
+# ad-hoc `npx` downloads at scan time, per the same section. Covers three
+# of the runbook's tools in one file: license-checker (npm), go-licenses
+# (Go), pip-licenses (Python) — each step no-ops when its ecosystem isn't
+# present, so this is safe to add to any repo.
+#
+# Optional secrets (steps skip gracefully when unset):
+#   GCHAT_WEBHOOK_URL - failure alerts
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # weekly
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual license inventory run"
+
+jobs:
+  license-inventory:
+    name: License inventory
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (if needed)
+        if: hashFiles('**/package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Go (if needed)
+        if: hashFiles('**/go.mod') != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Setup Python (if needed)
+        if: hashFiles('**/requirements.txt', '**/pyproject.toml', '**/setup.py') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # --- npm: license-checker, production and dev passes (runbook §7.1) ---
+      - name: npm license inventory
+        if: hashFiles('**/package.json') != ''
+        run: |
+          npm install --global license-checker@25.0.1
+          if [ -f package-lock.json ] || [ -f package.json ]; then
+            npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts 2>/dev/null || true
+            license-checker --json --out licenses-node-prod.json --production || true
+            license-checker --json --out licenses-node-all.json || true
+          fi
+
+      # --- Go: go-licenses, CSV output (runbook §7.1) ---
+      - name: Go license inventory
+        if: hashFiles('**/go.mod') != ''
+        run: |
+          go install github.com/google/go-licenses@v2.0.1
+          find . -name "go.mod" -not -path "*/.git/*" | while read -r gomod; do
+            dir=$(dirname "$gomod")
+            module=$(head -1 "$gomod" | awk '{print $2}')
+            echo "Reporting licenses for module: $module (in $dir)"
+            (cd "$dir" && go mod download 2>/dev/null; "$(go env GOPATH)/bin/go-licenses" report ./... > "/tmp/licenses-go-$(echo "$dir" | tr '/' '_').csv" 2>/dev/null || true)
+          done
+          cat /tmp/licenses-go-*.csv > licenses-go.csv 2>/dev/null || touch licenses-go.csv
+
+      # --- Python: pip-licenses, JSON output (runbook §7.1) ---
+      - name: Python license inventory
+        if: hashFiles('**/requirements.txt', '**/pyproject.toml', '**/setup.py') != ''
+        run: |
+          pip install pip-licenses==5.5.5
+          find . -name "requirements.txt" -not -path "*/.git/*" -not -path "*/node_modules/*" | while read -r req; do
+            dir=$(dirname "$req")
+            echo "Installing and reporting for: $req"
+            (cd "$dir" && pip install -r requirements.txt 2>/dev/null || true)
+          done
+          pip-licenses --format=json --output-file=licenses-py.json --with-system || true
+
+      - name: Bundle license reports as artifact set
+        run: |
+          mkdir -p license-reports
+          mv licenses-node-prod.json license-reports/ 2>/dev/null || true
+          mv licenses-node-all.json license-reports/ 2>/dev/null || true
+          mv licenses-go.csv license-reports/ 2>/dev/null || true
+          mv licenses-py.json license-reports/ 2>/dev/null || true
+          ls -la license-reports/ || echo "No license reports generated (no matching ecosystem in this repo)."
+
+      - name: Archive license reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-inventory-reports
+          path: license-reports/
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Send Google Chat Alert on Failure
+        if: failure()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          curl -sS -X POST "$GCHAT_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"text": "⚠️ [Low] License Inventory: scan failed in ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'

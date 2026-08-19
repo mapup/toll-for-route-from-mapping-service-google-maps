@@ -1,0 +1,116 @@
+name: ScanCode License Deep-Scan
+
+# PORTABLE TEMPLATE — copy into <your-repo>/.github/workflows/scancode.yml
+# as-is. Adapted from mapup-security-team/.github/workflows/scancode.yml
+# (Google Chat alert is an inline curl here instead of that repo's local
+# helper script).
+#
+# Source-level license detection for vendored/copied code with no manifest —
+# distinct blind spot from Trivy's license mode (manifest-based only) and
+# from the license-inventory workflow's per-ecosystem tools. Runbook §7.1:
+# "deep pass where vendored/copied code exists." No DefectDojo parser
+# exists for ScanCode; output is CycloneDX so it feeds Dependency-Track
+# under its own project version, separate from the primary Trivy SBOM.
+#
+# Optional secrets (steps skip gracefully when unset):
+#   DEPENDENCYTRACK_API_KEY - SBOM upload to Dependency-Track
+#   GCHAT_WEBHOOK_URL       - failure alerts
+
+on:
+  schedule:
+    - cron: '0 8 * * 0'   # weekly — source-level scan is slow, not a PR gate
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual ScanCode deep scan"
+
+jobs:
+  scancode:
+    name: License deep-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install ScanCode Toolkit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libmagic1
+          pip install scancode-toolkit
+
+      - name: Run ScanCode
+        run: |
+          # -l/--license, -c/--copyright: source-level detection (not
+          # manifest-based). --package is REQUIRED for the CycloneDX output
+          # to contain any components — without it the BOM is empty and
+          # Dependency-Track rejects the upload with HTTP 400.
+          scancode --license --copyright --package \
+            --cyclonedx scancode-sbom.json \
+            --processes 2 \
+            --timeout 120 \
+            . || true
+
+      - name: Clean SBOM for Dependency-Track
+        id: sbom_check
+        env:
+          DT_API_KEY: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+        run: |
+          # ScanCode's CycloneDX output is not schema-valid as-is: it emits
+          # null for optional fields (the schema requires omitting them),
+          # null component versions (required in spec 1.3), and non-string
+          # metadata property values. Dependency-Track validates the BOM
+          # strictly and rejects all of these with HTTP 400.
+          if [ -s scancode-sbom.json ]; then
+            jq '
+              walk(if type == "object" then with_entries(select(.value != null)) else . end)
+              | .components |= (. // [] | map(.version //= ""))
+              | if .metadata.properties then .metadata.properties |= map(select((.value | type) == "string")) else . end
+            ' scancode-sbom.json > scancode-sbom-clean.json
+            mv scancode-sbom-clean.json scancode-sbom.json
+          fi
+          count=$(jq '.components | length' scancode-sbom.json 2>/dev/null || echo 0)
+          echo "SBOM component count: $count"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          if [ -n "$DT_API_KEY" ]; then
+            echo "upload=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "DEPENDENCYTRACK_API_KEY not set — Dependency-Track upload will be skipped."
+            echo "upload=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload BOM to Dependency-Track
+        if: ${{ always() && steps.sbom_check.outputs.upload == 'true' && steps.sbom_check.outputs.count != '0' && steps.sbom_check.outputs.count != '' }}
+        uses: DependencyTrack/gh-upload-sbom@v3
+        with:
+          serverhostname: '44.194.0.211'
+          port: '8091'
+          protocol: 'http'
+          apikey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+          projectname: ${{ github.event.repository.name }}
+          projectversion: 'main-scancode'
+          bomfilename: 'scancode-sbom.json'
+          autocreate: 'true'
+
+      - name: Archive ScanCode report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scancode-sbom
+          path: scancode-sbom.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Send Google Chat Alert on Failure
+        if: failure()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          curl -sS -X POST "$GCHAT_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"text": "⚠️ [Medium] ScanCode: deep-scan failed in ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'

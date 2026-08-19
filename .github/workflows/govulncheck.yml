@@ -1,0 +1,123 @@
+name: govulncheck (Go SCA)
+
+# PORTABLE TEMPLATE — copy into <your-repo>/.github/workflows/govulncheck.yml
+# as-is. Adapted from mapup-security-team/.github/workflows/govulncheck.yml
+# (DefectDojo upload is an inline curl here instead of that repo's local
+# helper script).
+#
+# Go-specific dependency-CVE scanning per runbook §5.2. Reasons about actual
+# reachability (does the vulnerable function get called), not just presence
+# in go.sum — a stronger signal than OSV-Scanner's manifest-only check for
+# Go repos. No-ops on non-Go repos so this workflow is safe to have present
+# everywhere.
+#
+# Optional secrets (steps skip gracefully when unset):
+#   DEFECTDOJO_URL, DEFECTDOJO_API_KEY - findings upload
+#   GCHAT_WEBHOOK_URL                  - failure alerts
+
+on:
+  # No branch filter: repos differ in default-branch names, so scan PRs
+  # into any branch rather than assuming main/master/develop.
+  pull_request:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual govulncheck run"
+
+jobs:
+  govulncheck:
+    name: Scan Go dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Check for Go project
+        id: has-go
+        run: |
+          if [ -f "go.mod" ] || find . -name "go.mod" -not -path "*/.git/*" | grep -q .; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Go
+        if: steps.has-go.outputs.found == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Install govulncheck
+        if: steps.has-go.outputs.found == 'true'
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Run govulncheck
+        if: steps.has-go.outputs.found == 'true'
+        run: |
+          # Run per-module (monorepos may have more than one go.mod), preserving
+          # reachability evidence per runbook §5.2.
+          echo "[]" > govulncheck-report.json
+          find . -name "go.mod" -not -path "*/.git/*" | while read -r gomod; do
+            dir=$(dirname "$gomod")
+            echo "Scanning Go module in: $dir"
+            (cd "$dir" && "$(go env GOPATH)/bin/govulncheck" -json ./... > govulncheck-raw.json 2>/dev/null || true)
+            if [ -f "$dir/govulncheck-raw.json" ]; then
+              mv "$dir/govulncheck-raw.json" "govulncheck-$(echo "$dir" | tr '/' '_').json"
+            fi
+          done
+          # Combine per-module raw NDJSON outputs into one artifact for upload.
+          cat govulncheck-*_*.json > govulncheck-report.ndjson 2>/dev/null || touch govulncheck-report.ndjson
+
+      - name: Upload to DefectDojo
+        if: always() && steps.has-go.outputs.found == 'true'
+        env:
+          DOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+        run: |
+          if [ -z "$DOJO_URL" ] || [ -z "$DOJO_API_KEY" ]; then
+            echo "DEFECTDOJO_URL/DEFECTDOJO_API_KEY not set — skipping upload."
+            exit 0
+          fi
+          if [ ! -s govulncheck-report.ndjson ]; then
+            echo "No govulncheck output to upload."
+            exit 0
+          fi
+          curl -sS -X POST "$DOJO_URL/api/v2/reimport-scan/" \
+            -H "Authorization: Token $DOJO_API_KEY" \
+            -F "product_name=${{ github.event.repository.name }}" \
+            -F "product_type_name=Research and Development" \
+            -F "engagement_name=CI Dependency Scan" \
+            -F "scan_type=Govulncheck Scanner" \
+            -F "auto_create_context=True" \
+            -F "close_old_findings=True" \
+            -F "push_to_jira=False" \
+            -F "active=True" \
+            -F "verified=True" \
+            -F "group_by=finding_title" \
+            -F "file=@govulncheck-report.ndjson"
+
+      - name: Archive govulncheck report
+        if: always() && steps.has-go.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: govulncheck-report
+          path: govulncheck-report.ndjson
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Send Google Chat Alert on Failure
+        if: failure()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          curl -sS -X POST "$GCHAT_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"text": "🚨 [High] govulncheck: Go dependency vulnerabilities found in ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
