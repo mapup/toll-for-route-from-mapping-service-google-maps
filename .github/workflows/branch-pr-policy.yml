@@ -1,0 +1,231 @@
+name: Branch & PR Policy Enforcement
+
+# PORTABLE TEMPLATE — copy into
+# <your-repo>/.github/workflows/branch-pr-policy.yml as-is; works in any
+# repo, no secrets required (GCHAT_WEBHOOK_URL optional for alerts).
+#
+# ONE workflow, three enforcement duties:
+#
+#   1. Per-user branch quota (default 3). When someone who already owns
+#      MAX_BRANCHES_PER_USER branches creates another, the new branch is
+#      AUTO-DELETED immediately (create trigger) and an issue mentioning
+#      them explains why — they must delete one of their branches first.
+#   2. Daily sweep REPORTS existing over-quota users (run summary + GChat)
+#      without deleting their older branches — those may hold real work;
+#      only freshly created excess branches are deleted, so nothing with
+#      history disappears silently.
+#   3. Stale PRs: any PR open longer than STALE_PR_DAYS (default 30) is
+#      auto-closed with an explanatory comment. (GitHub has no API to
+#      truly delete a PR — close is the maximum; a closed PR can be
+#      reopened if it was actually still needed.)
+#
+# Branch ownership = the author of the branch's latest commit; on create
+# events the creator (github.actor) is authoritative. Exempt from quota
+# and deletion: the default branch, protected branches, shared branches
+# (main/master/develop/dev/staging/production), and bot branches
+# (dependabot/*, renovate/*, any *[bot] actor).
+#
+# Needs the explicit permissions below — if your org restricts the
+# GITHUB_TOKEN to read-only, this block overrides that for this workflow.
+
+on:
+  create:
+  schedule:
+    - cron: '0 3 * * *'   # daily sweep: stale PRs + quota report
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual policy sweep"
+
+env:
+  MAX_BRANCHES_PER_USER: '3'
+  STALE_PR_DAYS: '30'
+
+permissions:
+  contents: write        # delete refs (branches)
+  pull-requests: write   # comment on + close stale PRs
+  issues: write          # notify users whose branch was deleted
+
+concurrency:
+  group: branch-pr-policy
+  cancel-in-progress: false
+
+jobs:
+  enforce:
+    name: Enforce branch & PR policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Enforce per-user branch quota
+        id: branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const MAX = parseInt(process.env.MAX_BRANCHES_PER_USER, 10);
+            const { owner, repo } = context.repo;
+            const defaultBranch = context.payload.repository.default_branch;
+            const SHARED = new Set(['main', 'master', 'develop', 'dev', 'staging', 'production', defaultBranch]);
+            const BOT_PREFIXES = ['dependabot/', 'renovate/'];
+            const exempt = (name) => SHARED.has(name) || BOT_PREFIXES.some(p => name.startsWith(p));
+
+            const branches = await github.paginate(github.rest.repos.listBranches, { owner, repo, per_page: 100 });
+            const candidates = branches.filter(b => !b.protected && !exempt(b.name));
+
+            // Attribute each branch to the author of its tip commit. A brand-new
+            // branch with no commits of its own inherits the base tip's author —
+            // acceptable: the create-event path below uses the true creator.
+            const ownerOf = {};
+            for (const b of candidates) {
+              try {
+                const { data: c } = await github.rest.repos.getCommit({ owner, repo, ref: b.commit.sha });
+                ownerOf[b.name] = (c.author && c.author.login) || 'unknown';
+              } catch (e) {
+                ownerOf[b.name] = 'unknown';
+              }
+            }
+            const byUser = {};
+            for (const [name, user] of Object.entries(ownerOf)) {
+              (byUser[user] = byUser[user] || []).push(name);
+            }
+
+            let deleted = '';
+            if (context.eventName === 'create' && context.payload.ref_type === 'branch') {
+              const newBranch = context.payload.ref;
+              const actor = context.actor;
+              if (actor.endsWith('[bot]') || exempt(newBranch)) {
+                core.info(`Exempt: ${actor} created '${newBranch}' — no action.`);
+                return;
+              }
+              // Branches this actor already owns, not counting the one just created.
+              const others = (byUser[actor] || []).filter(n => n !== newBranch);
+              core.info(`${actor} owns ${others.length} other branch(es): ${others.join(', ') || 'none'}`);
+              if (others.length >= MAX) {
+                try {
+                  await github.rest.git.deleteRef({ owner, repo, ref: `heads/${newBranch}` });
+                } catch (e) {
+                  core.warning(`Could not delete '${newBranch}': ${e.message}`);
+                  return;
+                }
+                deleted = newBranch;
+                await github.rest.issues.create({
+                  owner, repo,
+                  title: `Branch limit: '${newBranch}' was auto-deleted`,
+                  body: [
+                    `@${actor} — this repo enforces a limit of **${MAX} branches per user**.`,
+                    ``,
+                    `You already have ${others.length}: ${others.map(n => `\`${n}\``).join(', ')}.`,
+                    `The new branch \`${newBranch}\` was deleted automatically.`,
+                    ``,
+                    `Delete (or merge) one of your existing branches, then recreate it.`,
+                    `If any commits were only on \`${newBranch}\`, they are still in your local clone — nothing is lost there.`,
+                  ].join('\n'),
+                });
+                await core.summary
+                  .addHeading('Branch quota enforced')
+                  .addRaw(`Deleted \`${newBranch}\` (creator @${actor} already at ${others.length}/${MAX}).`)
+                  .write();
+              }
+            } else {
+              // Scheduled/manual sweep: report over-quota users. Deliberately no
+              // deletion here — pre-existing branches may hold real work; only
+              // brand-new excess branches (create path above) are auto-deleted.
+              const violators = Object.entries(byUser)
+                .filter(([u, list]) => u !== 'unknown' && !u.endsWith('[bot]') && list.length > MAX);
+              if (violators.length) {
+                const rows = violators.map(([u, list]) => [u, String(list.length), list.join(', ')]);
+                await core.summary
+                  .addHeading(`Users over the ${MAX}-branch limit`)
+                  .addTable([[
+                    { data: 'User', header: true },
+                    { data: 'Branches', header: true },
+                    { data: 'Names', header: true },
+                  ], ...rows])
+                  .write();
+                core.setOutput('violators', violators.map(([u, list]) => `${u}(${list.length})`).join(', '));
+              } else {
+                core.info(`No user exceeds the ${MAX}-branch limit.`);
+              }
+            }
+            core.setOutput('deleted', deleted);
+
+      - name: Close stale PRs
+        id: stale
+        if: github.event_name != 'create'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const DAYS = parseInt(process.env.STALE_PR_DAYS, 10);
+            const { owner, repo } = context.repo;
+            const cutoff = Date.now() - DAYS * 24 * 60 * 60 * 1000;
+
+            const prs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 });
+            const stale = prs.filter(pr => new Date(pr.created_at).getTime() < cutoff);
+            core.info(`${prs.length} open PR(s), ${stale.length} older than ${DAYS} days.`);
+
+            const closed = [];
+            for (const pr of stale) {
+              try {
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: pr.number,
+                  body: `Auto-closing: this PR has been open for more than ${DAYS} days ` +
+                        `(opened ${pr.created_at.slice(0, 10)}) per the org's PR-hygiene policy. ` +
+                        `If it is still needed, reopen it or open a fresh PR from an updated branch.`,
+                });
+                await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: 'closed' });
+                closed.push(`#${pr.number} ${pr.title}`);
+              } catch (e) {
+                core.warning(`Could not close PR #${pr.number}: ${e.message}`);
+              }
+            }
+            if (closed.length) {
+              await core.summary
+                .addHeading(`Stale PRs closed (open > ${DAYS} days)`)
+                .addList(closed)
+                .write();
+            }
+            core.setOutput('closed_count', String(closed.length));
+            core.setOutput('closed_list', closed.join('; '));
+
+      - name: Send Google Chat Alert
+        if: always()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+          DELETED_BRANCH: ${{ steps.branches.outputs.deleted }}
+          QUOTA_VIOLATORS: ${{ steps.branches.outputs.violators }}
+          CLOSED_COUNT: ${{ steps.stale.outputs.closed_count }}
+          CLOSED_LIST: ${{ steps.stale.outputs.closed_list }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          MSG=""
+          if [ -n "$DELETED_BRANCH" ]; then
+            MSG="🪓 Branch quota: deleted '$DELETED_BRANCH' in ${{ github.repository }}."
+          fi
+          if [ -n "$QUOTA_VIOLATORS" ]; then
+            MSG="$MSG 📋 Over branch limit: $QUOTA_VIOLATORS in ${{ github.repository }}."
+          fi
+          if [ -n "$CLOSED_COUNT" ] && [ "$CLOSED_COUNT" != "0" ]; then
+            MSG="$MSG 🧹 Closed $CLOSED_COUNT stale PR(s) in ${{ github.repository }}: $CLOSED_LIST"
+          fi
+          if [ -z "$MSG" ]; then
+            echo "Nothing to report."
+            exit 0
+          fi
+          export MSG_TEXT="$MSG"
+          # JSON built in Python, not shell interpolation — PR titles in the
+          # message can contain quotes that would break hand-rolled JSON.
+          python3 - <<'PY'
+          import json, os, urllib.request
+          msg = os.environ.get("MSG_TEXT", "")
+          run_url = "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          body = json.dumps({"text": f"{msg} — {run_url}"}).encode()
+          req = urllib.request.Request(
+              os.environ["GCHAT_WEBHOOK_URL"], data=body,
+              headers={"Content-Type": "application/json"})
+          urllib.request.urlopen(req, timeout=15)
+          PY
+        shell: bash

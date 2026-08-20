@@ -1,0 +1,97 @@
+name: OSV-Scanner Dependency Scan
+
+# PORTABLE TEMPLATE — copy into <your-repo>/.github/workflows/osv-scanner.yml
+# as-is. Adapted from mapup-security-team/.github/workflows/osv-scanner.yml
+# (DefectDojo upload is an inline curl here instead of that repo's local
+# helper script).
+#
+# Cross-ecosystem SCA baseline (runbook §5.2) — catches dependency CVEs
+# regardless of language, complementing the per-language scanners
+# (govulncheck for Go, pip-audit for Python) that reason more deeply about
+# reachability within their own ecosystem.
+#
+# Optional secrets (steps skip gracefully when unset):
+#   DEFECTDOJO_URL, DEFECTDOJO_API_KEY - findings upload
+#   GCHAT_WEBHOOK_URL                  - failure alerts
+
+on:
+  # No branch filter: repos differ in default-branch names, so scan PRs
+  # into any branch rather than assuming main/master/develop.
+  pull_request:
+  schedule:
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual OSV-Scanner run"
+
+jobs:
+  osv-scanner:
+    name: Scan dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install OSV-Scanner
+        run: |
+          OSV_VERSION=$(curl -s https://api.github.com/repos/google/osv-scanner/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          echo "Installing OSV-Scanner version: $OSV_VERSION"
+          curl -sSfL "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64" -o /usr/local/bin/osv-scanner
+          chmod +x /usr/local/bin/osv-scanner
+
+      - name: Run OSV-Scanner
+        run: |
+          osv-scanner scan source --recursive --format=json --output-file=osv-report.json . || true
+
+      - name: Upload to DefectDojo
+        if: always()
+        env:
+          DOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+        run: |
+          if [ -z "$DOJO_URL" ] || [ -z "$DOJO_API_KEY" ]; then
+            echo "DEFECTDOJO_URL/DEFECTDOJO_API_KEY not set — skipping upload."
+            exit 0
+          fi
+          if [ ! -s osv-report.json ]; then
+            echo "No OSV-Scanner output to upload."
+            exit 0
+          fi
+          curl -sS -X POST "$DOJO_URL/api/v2/reimport-scan/" \
+            -H "Authorization: Token $DOJO_API_KEY" \
+            -F "product_name=${{ github.event.repository.name }}" \
+            -F "product_type_name=Research and Development" \
+            -F "engagement_name=CI Dependency Scan" \
+            -F "scan_type=OSV Scan" \
+            -F "auto_create_context=True" \
+            -F "close_old_findings=True" \
+            -F "push_to_jira=False" \
+            -F "active=True" \
+            -F "verified=True" \
+            -F "group_by=finding_title" \
+            -F "file=@osv-report.json"
+
+      - name: Archive OSV-Scanner report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: osv-scanner-report
+          path: osv-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Send Google Chat Alert on Failure
+        if: failure()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          curl -sS -X POST "$GCHAT_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"text": "🚨 [High] OSV-Scanner: dependency vulnerabilities found in ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'

@@ -1,0 +1,102 @@
+name: TruffleHog Secret Verification
+
+# PORTABLE TEMPLATE — copy into <your-repo>/.github/workflows/trufflehog.yml
+# as-is. Adapted from mapup-security-team/.github/workflows/trufflehog.yml
+# (DefectDojo upload is an inline curl here instead of that repo's local
+# helper script).
+#
+# Distinct from gitleaks: gitleaks pattern-matches for secret-shaped
+# strings, TruffleHog additionally calls each provider's own API (e.g. AWS
+# GetCallerIdentity) to confirm whether a matched credential is still live.
+# Runbook §4.2: requires approval per §1.1/§1.2 before running against any
+# sensitive-classified repo, since verification makes real outbound calls.
+#
+# Optional secrets (steps skip gracefully when unset):
+#   DEFECTDOJO_URL, DEFECTDOJO_API_KEY - findings upload
+#   GCHAT_WEBHOOK_URL                  - failure alerts
+
+on:
+  # No branch filter: repos differ in default-branch names, so scan PRs
+  # into any branch rather than assuming main/master/develop.
+  pull_request:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual secret verification scan"
+
+jobs:
+  trufflehog:
+    name: Verify secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install TruffleHog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run TruffleHog
+        run: |
+          # Retain verified, unknown, AND unverified findings per runbook §4.2
+          # — triage unknown/unverified rather than discarding them.
+          trufflehog git file://. \
+            --results=verified,unknown,unverified \
+            --json \
+            --fail-on-scan-errors > trufflehog-report.json || true
+
+      - name: Upload to DefectDojo
+        if: always()
+        env:
+          DOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+        run: |
+          if [ -z "$DOJO_URL" ] || [ -z "$DOJO_API_KEY" ]; then
+            echo "DEFECTDOJO_URL/DEFECTDOJO_API_KEY not set — skipping upload."
+            exit 0
+          fi
+          if [ ! -s trufflehog-report.json ]; then
+            echo "No TruffleHog output to upload."
+            exit 0
+          fi
+          curl -sS -X POST "$DOJO_URL/api/v2/reimport-scan/" \
+            -H "Authorization: Token $DOJO_API_KEY" \
+            -F "product_name=${{ github.event.repository.name }}" \
+            -F "product_type_name=Research and Development" \
+            -F "engagement_name=CI Secret Verification" \
+            -F "scan_type=Trufflehog Scan" \
+            -F "auto_create_context=True" \
+            -F "close_old_findings=True" \
+            -F "push_to_jira=False" \
+            -F "active=True" \
+            -F "verified=True" \
+            -F "group_by=finding_title" \
+            -F "file=@trufflehog-report.json"
+
+      - name: Archive TruffleHog report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trufflehog-report
+          path: trufflehog-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Send Google Chat Alert on Failure
+        if: failure()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          curl -sS -X POST "$GCHAT_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"text": "🚨 [Critical] TruffleHog: verified secret detected in ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'

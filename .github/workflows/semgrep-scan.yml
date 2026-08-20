@@ -1,0 +1,160 @@
+# Semgrep scan -> Google Sheet dashboard (via Apps Script webhook)
+#
+# Copy this file to .github/workflows/semgrep-scan.yml in each repo (on the
+# default branch — the schedule trigger only fires from there).
+#
+# Required secrets (set once at the ORG level, access: all repositories,
+# so every repo inherits them — or per repo if org secrets can't be used):
+#   SEMGREP_SHEET_URL   - the Apps Script web app /exec URL (see Code.gs)
+#   SEMGREP_SHEET_TOKEN - the token printed by the script's setup() function
+#
+# Repo ownership lives in the sheet's "Owners" tab — edit it there.
+
+name: Semgrep Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to scan (leave empty = repo's default branch)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 4,16 * * *" # twice a day at 04:00 & 16:00 UTC (9:30 AM & 9:30 PM IST)
+
+permissions:
+  contents: read
+
+# One scan at a time per repo; later runs queue instead of overlapping
+concurrency:
+  group: semgrep-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Resolve branch
+        id: branch
+        # github context values go through env, never interpolated into the
+        # script body — a crafted branch name must stay data, not shell code.
+        env:
+          INPUT_BRANCH: ${{ github.event.inputs.branch }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          BRANCH="$INPUT_BRANCH"
+          if [ -z "$BRANCH" ]; then
+            # Empty input or scheduled run: scan the branch this workflow
+            # runs on — the repo's default branch unless chosen otherwise.
+            BRANCH="$REF_NAME"
+          fi
+          echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ steps.branch.outputs.name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install semgrep
+        run: pip install --quiet semgrep
+
+      - name: Run semgrep
+        # --config auto picks rules based on the languages it detects.
+        # To pin rulesets instead: --config p/ci --config p/secrets
+        run: semgrep scan --config auto --json --output semgrep-results.json
+
+      - name: Upload raw results
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+
+      - name: Report to Google Sheet
+        env:
+          WEBAPP_URL: ${{ secrets.SEMGREP_SHEET_URL }}
+          TOKEN: ${{ secrets.SEMGREP_SHEET_TOKEN }}
+          REPO_FULL: ${{ github.repository }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          TRIGGER: ${{ github.event_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$WEBAPP_URL" ] || [ -z "$TOKEN" ]; then
+            echo "::error::SEMGREP_SHEET_URL / SEMGREP_SHEET_TOKEN secrets are not visible to this repo — check the org secrets' names and 'Repository access' setting, or add them as repo-level secrets."
+            exit 1
+          fi
+
+          python3 - <<'PY'
+          import json
+          import os
+          from collections import Counter
+          from datetime import datetime, timezone
+
+          with open("semgrep-results.json") as f:
+              results = json.load(f).get("results", [])
+
+          sev = Counter(
+              r.get("extra", {}).get("severity", "UNKNOWN").upper() for r in results
+          )
+          findings = [
+              {
+                  "check_id": r.get("check_id", ""),
+                  "severity": r.get("extra", {}).get("severity", ""),
+                  "path": r.get("path", ""),
+                  "start_line": (r.get("start") or {}).get("line"),
+                  "end_line": (r.get("end") or {}).get("line"),
+                  "message": (r.get("extra", {}).get("message") or "")[:400],
+              }
+              for r in results
+          ]
+          payload = {
+              "token": os.environ["TOKEN"],
+              "repo": os.environ["REPO_FULL"].split("/", 1)[1],
+              "branch": os.environ["BRANCH"],
+              "total": len(results),
+              "error": sev.get("ERROR", 0),
+              "warning": sev.get("WARNING", 0),
+              "info": sev.get("INFO", 0),
+              "scanned_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+              "trigger": "scheduled" if os.environ["TRIGGER"] == "schedule" else "manual",
+              "run_url": os.environ["RUN_URL"],
+              "findings": findings,
+          }
+          with open("payload.json", "w") as f:
+              json.dump(payload, f)
+          print(f"Reporting {payload['total']} findings for "
+                f"{payload['repo']}@{payload['branch']}")
+          PY
+
+          # All repos share one cron tick, so stagger the posts a little —
+          # Apps Script allows ~30 simultaneous executions and returns an HTML
+          # error page to the overflow. Keep the sleeps SHORT: runner minutes
+          # are billed, waiting included.
+          sleep $((RANDOM % 20))
+
+          # -L is required: Apps Script answers with a redirect to the response.
+          # Do NOT add -X POST — it would force POST on the redirect too, which
+          # Google's response endpoint rejects. -d already makes this a POST.
+          for attempt in 1 2 3; do
+            RESPONSE=$(curl -sSL -H "Content-Type: application/json" \
+              --data-binary @payload.json "$WEBAPP_URL" || true)
+            if echo "$RESPONSE" | grep -q '"ok":true'; then
+              echo "Webhook response: $RESPONSE"
+              exit 0
+            fi
+            if echo "$RESPONSE" | grep -q '"ok":false'; then
+              # Real rejection (bad token, bad payload) — retrying won't help
+              echo "::error::Webhook rejected the report: $RESPONSE"
+              exit 1
+            fi
+            echo "Attempt $attempt got a transient Apps Script error; retrying..."
+            sleep $((attempt * 15 + RANDOM % 15))
+          done
+          echo "::error::Webhook still failing after 3 attempts"
+          echo "$(echo "$RESPONSE" | head -c 300)"
+          exit 1
