@@ -67,7 +67,7 @@ jobs:
       - name: Go license inventory
         if: hashFiles('**/go.mod') != ''
         run: |
-          go install github.com/google/go-licenses@v2.0.1
+          go install github.com/google/go-licenses/v2@v2.0.1
           find . -name "go.mod" -not -path "*/.git/*" | while read -r gomod; do
             dir=$(dirname "$gomod")
             module=$(head -1 "$gomod" | awk '{print $2}')
