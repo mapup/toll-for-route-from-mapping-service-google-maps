@@ -1,4 +1,4 @@
-name: License Inventory (npm / Go / Python)
+name: License Inventory (npm / Python)
 
 # PORTABLE TEMPLATE — copy into
 # <your-repo>/.github/workflows/license-inventory.yml as-is. Adapted from
@@ -9,9 +9,15 @@ name: License Inventory (npm / Go / Python)
 # "inventory aids" than ScanCode's source-level deep pass, reading package
 # manifests rather than scanning file contents. Pinned installs, not
 # ad-hoc `npx` downloads at scan time, per the same section. Covers three
-# of the runbook's tools in one file: license-checker (npm), go-licenses
-# (Go), pip-licenses (Python) — each step no-ops when its ecosystem isn't
-# present, so this is safe to add to any repo.
+# two of the runbook's tools in one file: license-checker (npm) and
+# pip-licenses (Python) — each step no-ops when its ecosystem isn't
+# present.
+#
+# NO-GO VARIANT: this is license-inventory.yml with the Go steps removed,
+# for repos that have no go.mod. The Go steps were guarded by
+# hashFiles('**/go.mod') and so never ran there; carrying them only added
+# dead config. If a repo later adds Go, copy the full
+# license-inventory.yml over this file.
 #
 # Optional secrets (steps skip gracefully when unset):
 #   GCHAT_WEBHOOK_URL - failure alerts
@@ -40,12 +46,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Setup Go (if needed)
-        if: hashFiles('**/go.mod') != ''
-        uses: actions/setup-go@v5
-        with:
-          go-version: 'stable'
-
       - name: Setup Python (if needed)
         if: hashFiles('**/requirements.txt', '**/pyproject.toml', '**/setup.py') != ''
         uses: actions/setup-python@v5
@@ -64,19 +64,6 @@ jobs:
           fi
 
       # --- Go: go-licenses, CSV output (runbook §7.1) ---
-      - name: Go license inventory
-        if: hashFiles('**/go.mod') != ''
-        run: |
-          go install github.com/google/go-licenses@v2.0.1
-          find . -name "go.mod" -not -path "*/.git/*" | while read -r gomod; do
-            dir=$(dirname "$gomod")
-            module=$(head -1 "$gomod" | awk '{print $2}')
-            echo "Reporting licenses for module: $module (in $dir)"
-            (cd "$dir" && go mod download 2>/dev/null; "$(go env GOPATH)/bin/go-licenses" report ./... > "/tmp/licenses-go-$(echo "$dir" | tr '/' '_').csv" 2>/dev/null || true)
-          done
-          cat /tmp/licenses-go-*.csv > licenses-go.csv 2>/dev/null || touch licenses-go.csv
-
-      # --- Python: pip-licenses, JSON output (runbook §7.1) ---
       - name: Python license inventory
         if: hashFiles('**/requirements.txt', '**/pyproject.toml', '**/setup.py') != ''
         run: |
@@ -93,7 +80,6 @@ jobs:
           mkdir -p license-reports
           mv licenses-node-prod.json license-reports/ 2>/dev/null || true
           mv licenses-node-all.json license-reports/ 2>/dev/null || true
-          mv licenses-go.csv license-reports/ 2>/dev/null || true
           mv licenses-py.json license-reports/ 2>/dev/null || true
           ls -la license-reports/ || echo "No license reports generated (no matching ecosystem in this repo)."
 
