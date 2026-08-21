@@ -1,0 +1,144 @@
+name: pip-audit (Python SCA)
+
+# PORTABLE TEMPLATE — copy into <your-repo>/.github/workflows/pip-audit.yml
+# as-is. Adapted from mapup-security-team/.github/workflows/pip-audit.yml
+# (DefectDojo upload is an inline curl here instead of that repo's local
+# helper script).
+#
+# Python-specific dependency-CVE scanning per runbook §5.2. Covers the
+# actual environment/lock format in use (requirements.txt, pyproject.toml,
+# Pipfile) rather than assuming requirements.txt = production. No-ops on
+# non-Python repos so this workflow is safe to have present everywhere.
+#
+# Optional secrets (steps skip gracefully when unset):
+#   DEFECTDOJO_URL, DEFECTDOJO_API_KEY - findings upload
+#   GCHAT_WEBHOOK_URL                  - failure alerts
+
+on:
+  # No branch filter: repos differ in default-branch names, so scan PRs
+  # into any branch rather than assuming main/master/develop.
+  pull_request:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual run"
+        required: false
+        default: "Manual pip-audit run"
+
+jobs:
+  pip-audit:
+    name: Scan Python dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Check for Python project
+        id: has-python
+        run: |
+          if find . -name "requirements.txt" -o -name "pyproject.toml" -o -name "Pipfile" \
+              -not -path "*/.git/*" -not -path "*/node_modules/*" -not -path "*/venv/*" -not -path "*/.venv/*" \
+              | grep -q .; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Python
+        if: steps.has-python.outputs.found == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install pip-audit
+        if: steps.has-python.outputs.found == 'true'
+        run: pip install pip-audit
+
+      - name: Run pip-audit
+        if: steps.has-python.outputs.found == 'true'
+        run: |
+          echo '{"dependencies":[]}' > pip-audit-report.json
+          # requirements.txt-based projects: audit the actual lock file(s) in
+          # place, not a blind `pip freeze` of whatever happens to be installed.
+          find . -name "requirements.txt" -not -path "*/.git/*" -not -path "*/node_modules/*" | while read -r req; do
+            dir=$(dirname "$req")
+            echo "Auditing: $req"
+            (cd "$dir" && pip-audit -r requirements.txt --format=json --output=pip-audit-raw.json --progress-spinner=off || true)
+            if [ -f "$dir/pip-audit-raw.json" ]; then
+              mv "$dir/pip-audit-raw.json" "pip-audit-$(echo "$dir" | tr '/' '_').json"
+            fi
+          done
+          # pyproject.toml (Poetry/PDM) projects: audit the project directory directly.
+          find . -name "pyproject.toml" -not -path "*/.git/*" -not -path "*/node_modules/*" | while read -r pyproject; do
+            dir=$(dirname "$pyproject")
+            echo "Auditing: $pyproject"
+            (cd "$dir" && pip-audit --format=json --output=pip-audit-raw.json --progress-spinner=off || true)
+            if [ -f "$dir/pip-audit-raw.json" ]; then
+              mv "$dir/pip-audit-raw.json" "pip-audit-$(echo "$dir" | tr '/' '_').json"
+            fi
+          done
+          # Merge all per-directory dependency lists into one report (DefectDojo's
+          # pip-audit parser expects a single object with a top-level "dependencies" key).
+          python3 -c "
+          import json, glob
+          merged = {'dependencies': []}
+          for f in glob.glob('pip-audit-*_*.json'):
+              try:
+                  data = json.load(open(f))
+                  merged['dependencies'].extend(data.get('dependencies', []))
+              except Exception as e:
+                  print(f'Skipping {f}: {e}')
+          json.dump(merged, open('pip-audit-report.json', 'w'))
+          "
+
+      - name: Upload to DefectDojo
+        if: always() && steps.has-python.outputs.found == 'true'
+        env:
+          DOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+        run: |
+          if [ -z "$DOJO_URL" ] || [ -z "$DOJO_API_KEY" ]; then
+            echo "DEFECTDOJO_URL/DEFECTDOJO_API_KEY not set — skipping upload."
+            exit 0
+          fi
+          if [ ! -s pip-audit-report.json ]; then
+            echo "No pip-audit output to upload."
+            exit 0
+          fi
+          curl -sS -X POST "$DOJO_URL/api/v2/reimport-scan/" \
+            -H "Authorization: Token $DOJO_API_KEY" \
+            -F "product_name=${{ github.event.repository.name }}" \
+            -F "product_type_name=Research and Development" \
+            -F "engagement_name=CI Dependency Scan" \
+            -F "scan_type=pip-audit Scan" \
+            -F "auto_create_context=True" \
+            -F "close_old_findings=True" \
+            -F "push_to_jira=False" \
+            -F "active=True" \
+            -F "verified=True" \
+            -F "group_by=finding_title" \
+            -F "file=@pip-audit-report.json"
+
+      - name: Archive pip-audit report
+        if: always() && steps.has-python.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pip-audit-report
+          path: pip-audit-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Send Google Chat Alert on Failure
+        if: failure()
+        env:
+          GCHAT_WEBHOOK_URL: ${{ secrets.GCHAT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GCHAT_WEBHOOK_URL" ]; then
+            echo "GCHAT_WEBHOOK_URL not set — skipping alert."
+            exit 0
+          fi
+          curl -sS -X POST "$GCHAT_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"text": "🚨 [High] pip-audit: Python dependency vulnerabilities found in ${{ github.repository }} — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
