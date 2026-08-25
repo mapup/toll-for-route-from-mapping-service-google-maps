@@ -1,0 +1,34 @@
+title = "gitleaks config for tolltally-toll-for-route-google-maps"
+
+[extend]
+# Layer these rules on top of gitleaks' built-in ruleset (AWS, Stripe, Slack,
+# etc.) instead of replacing it.
+useDefault = true
+
+[[rules]]
+id = "hardcoded-uri-credentials"
+description = "Username:password embedded directly in a connection URI (mongodb, postgres, mysql, redis, amqp, ldap, ftp, http, etc.) — not caught by the default generic-api-key rule when the variable name doesn't contain a recognized keyword"
+regex = '''(?i)\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|redis(?:s)?|amqp(?:s)?|ldap(?:s)?|ftp|sftp|smb|https?):\/\/[a-zA-Z0-9_.+-]{3,64}:[^\s'"/]{4,64}@[a-zA-Z0-9._-]+'''
+entropy = 2.5
+keywords = [
+    "mongodb",
+    "postgres",
+    "postgresql",
+    "mysql",
+    "redis",
+    "amqp",
+    "ldap",
+    "ftp",
+    "sftp",
+    "smb",
+    "http",
+    "https",
+]
+
+[[rules.allowlists]]
+description = "Ignore obvious placeholder/template credentials (docs, .env.sample, README examples)"
+regexTarget = "match"
+regexes = [
+    '''(?i):\/\/(?:user(?:name)?|test|dummy|example|placeholder|youruser|<[^>]+>|\$\{[^}]+\}|%[a-zA-Z_]+%):''',
+    '''(?i):(?:pass(?:word)?|changeme|xxxx+|example|placeholder|secret|<[^>]+>|\$\{[^}]+\}|%[a-zA-Z_]+%)@''',
+]
