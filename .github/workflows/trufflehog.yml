@@ -38,9 +38,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install TruffleHog
+      - name: Install TruffleHog (pinned release, checksum-verified)
+        env:
+          TRUFFLEHOG_VERSION: 3.97.1
+          TRUFFLEHOG_SHA256: f863ea3a8d786f7d097870496c977944cce7372a2fe1e56707d965016e543ece
         run: |
-          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+          set -euo pipefail
+          curl -sSfL -o /tmp/trufflehog.tar.gz \
+            "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_amd64.tar.gz"
+          echo "${TRUFFLEHOG_SHA256}  /tmp/trufflehog.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/trufflehog.tar.gz -C /usr/local/bin trufflehog
 
       - name: Run TruffleHog
         run: |

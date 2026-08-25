@@ -33,6 +33,11 @@ jobs:
 
       - name: Wrap results with repo metadata and send
         if: always()
+        env:
+          WEBHOOK_URL: ${{ secrets.SAST_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.SAST_WEBHOOK_TOKEN }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+          REPO: ${{ github.event.repository.name }}
         run: |
           # Build a wrapper with repo/org info + semgrep results
           # jq may not be in semgrep image, so use python which is guaranteed
@@ -81,9 +86,9 @@ jobs:
           print(f'✅ Wrapped {len(payload[\"results\"])} findings for {org}/{repo}')
           "
 
-          curl -X POST "${{ secrets.SAST_WEBHOOK_URL }}?branch=${{ github.head_ref || github.ref_name }}&&repo=${{ github.event.repository.name }}" \
+          curl -X POST "${WEBHOOK_URL}?branch=${BRANCH}&&repo=${REPO}" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.SAST_WEBHOOK_TOKEN }}" \
+            -H "Authorization: Bearer ${WEBHOOK_TOKEN}" \
             -d @semgrep-payload.json
 
 # name: Semgrep SAST

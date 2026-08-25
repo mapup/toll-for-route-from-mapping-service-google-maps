@@ -24,9 +24,6 @@ $request_parameters = array(
 // Connection
 $ggle = curl_init();
 
-curl_setopt($ggle, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($ggle, CURLOPT_SSL_VERIFYPEER, false);
-
 curl_setopt($ggle, CURLOPT_URL, $GMAPS_API_URL.'?origin='.urlencode($source).'&destination='.urlencode($destination).'&key='.$GMAPS_API_KEY.'');
 curl_setopt($ggle, CURLOPT_RETURNTRANSFER, true);
 
@@ -51,9 +48,6 @@ $polyline_gmaps = $data_gmaps['routes']['0']['overview_polyline']['points'];
 
 // Using TollGuru API
 $curl = curl_init();
-
-curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
 
 $postdata = array(
