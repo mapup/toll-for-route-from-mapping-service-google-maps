@@ -38,10 +38,15 @@ jobs:
 
       - name: Send JSON to endpoint
         if: always()
+        env:
+          WEBHOOK_URL: ${{ secrets.SAST_GITLEAK_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.SAST_WEBHOOK_TOKEN }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+          REPO: ${{ github.event.repository.name }}
         run: |
-          curl -X POST "${{ secrets.SAST_GITLEAK_WEBHOOK_URL }}?branch=${{ github.head_ref || github.ref_name }}&&repo=${{ github.event.repository.name }}" \
+          curl -X POST "${WEBHOOK_URL}?branch=${BRANCH}&&repo=${REPO}" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.SAST_WEBHOOK_TOKEN }}" \
+            -H "Authorization: Bearer ${WEBHOOK_TOKEN}" \
             -d @gitleaks-report.json
 
 # name: Gitleaks Secret Scan
