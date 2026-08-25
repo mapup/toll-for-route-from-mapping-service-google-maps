@@ -34,13 +34,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
       - name: Install TruffleHog
+        env:
+          # Pinned to an immutable release tag; bump TRUFFLEHOG_VERSION and
+          # INSTALLER_SHA256 together (sha256sum of scripts/install.sh at that tag).
+          TRUFFLEHOG_VERSION: v3.97.1
+          INSTALLER_SHA256: c394defeaea8a7c48f828a2051b608a9b19f43f34b891407b66a386c3e2591e2
         run: |
-          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL "https://raw.githubusercontent.com/trufflesecurity/trufflehog/${TRUFFLEHOG_VERSION}/scripts/install.sh" -o install.sh
+          echo "${INSTALLER_SHA256}  install.sh" | sha256sum -c -
+          sh install.sh -b /usr/local/bin "${TRUFFLEHOG_VERSION}"
+          rm install.sh
 
       - name: Run TruffleHog
         run: |
@@ -81,7 +89,7 @@ jobs:
 
       - name: Archive TruffleHog report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: trufflehog-report
           path: trufflehog-report.json

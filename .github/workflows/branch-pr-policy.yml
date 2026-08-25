@@ -60,7 +60,7 @@ jobs:
     steps:
       - name: Enforce per-user branch quota
         id: branches
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const MAX = parseInt(process.env.MAX_BRANCHES_PER_USER, 10);
@@ -153,7 +153,7 @@ jobs:
       - name: Close stale PRs
         id: stale
         if: github.event_name != 'create'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const DAYS = parseInt(process.env.STALE_PR_DAYS, 10);

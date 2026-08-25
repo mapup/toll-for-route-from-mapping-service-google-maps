@@ -47,22 +47,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.inputs.branch || 'main' }}
       - name: Set up Node.js
         if: ${{ matrix.projectStack == 'node' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
 
       - name: Log manual run reason
         if: github.event_name == 'workflow_dispatch'
-        run: echo "Manual trigger - ${{ github.event.inputs.reason }}"
+        env:
+          RUN_REASON: ${{ github.event.inputs.reason }}
+        run: echo "Manual trigger - $RUN_REASON"
 
       - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@v7.1.0
+        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4 # v7.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:

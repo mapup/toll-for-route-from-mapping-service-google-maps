@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Install ScanCode Toolkit
         run: |
@@ -82,7 +82,7 @@ jobs:
 
       - name: Upload BOM to Dependency-Track
         if: ${{ always() && steps.sbom_check.outputs.upload == 'true' && steps.sbom_check.outputs.count != '0' && steps.sbom_check.outputs.count != '' }}
-        uses: DependencyTrack/gh-upload-sbom@v3
+        uses: DependencyTrack/gh-upload-sbom@48feab3080ff9e8f51f4d21861d9fc914eb744f5 # v3
         with:
           serverhostname: '44.194.0.211'
           port: '8091'
@@ -95,7 +95,7 @@ jobs:
 
       - name: Archive ScanCode report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: scancode-sbom
           path: scancode-sbom.json
