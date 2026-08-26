@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# GUI clients (VS Code, SourceTree, GitHub Desktop, JetBrains) are launched from
+# Finder, not a shell, so they inherit a bare /usr/bin:/bin PATH with no Homebrew.
+# Without this the scan below would "fail closed" on every GUI commit and report
+# gitleaks as missing when it is installed.
+export PATH="/opt/homebrew/bin:/usr/local/bin:/opt/local/bin:$HOME/.local/bin:$HOME/go/bin:$PATH"
+
+# ---------------------------------------------------------------------------
+# Secret scan - BLOCKING.
+#
+# `gitleaks git --staged` scans only the added lines of the staged diff, so a
+# pre-existing secret elsewhere in a touched file does not re-flag on every
+# commit, and cost stays proportional to the change (~30ms on a normal diff).
+#
+# REPO_ROOT is passed explicitly as the scan target: gitleaks resolves both
+# .gitleaks.toml and .gitleaksignore relative to it, and silently falls back to
+# its built-in defaults when the target is a subdirectory.
+# ---------------------------------------------------------------------------
+if [ "${GITLEAKS_SKIP:-0}" = "1" ]; then
+  echo "[pre-commit] WARNING: GITLEAKS_SKIP=1 - secret scan bypassed for this commit."
+else
+  if ! command -v gitleaks >/dev/null 2>&1; then
+    echo "[pre-commit] BLOCKED: gitleaks is not installed, so this commit cannot be checked for secrets."
+    echo "[pre-commit]   Install: ./hooks/install.sh"
+    echo "[pre-commit]   Or see:  https://github.com/gitleaks/gitleaks#installing"
+    exit 1
+  fi
+
+  # Both files are optional. Passing --config for a file that does not exist is
+  # a fatal error in gitleaks, which the check below would misread as a leak and
+  # block every commit - so only pass the flags when the files are actually there.
+  scan_args=(git --staged --no-banner --redact --verbose)
+  if [ -f "$REPO_ROOT/.gitleaks.toml" ]; then
+    scan_args+=(--config "$REPO_ROOT/.gitleaks.toml")
+  fi
+  if [ -f "$REPO_ROOT/.gitleaksignore" ]; then
+    scan_args+=(--gitleaks-ignore-path "$REPO_ROOT/.gitleaksignore")
+  fi
+  scan_args+=("$REPO_ROOT")
+
+  echo "[pre-commit] Scanning staged changes for secrets..."
+  if ! gitleaks "${scan_args[@]}"; then
+    echo ""
+    echo "[pre-commit] BLOCKED: a secret was found in the staged changes (redacted above)."
+    echo "[pre-commit]   1. Remove it from the code and read it from an env var / secret manager."
+    echo "[pre-commit]   2. Rotate it - treat anything you typed into a file as already leaked."
+    echo "[pre-commit]   3. False positive? Prefer a value-anchored allowlist in .gitleaks.toml."
+    echo "[pre-commit]      It applies to staged, push and CI scans alike; a .gitleaksignore"
+    echo "[pre-commit]      fingerprint only matches the scan mode that printed it."
+    exit 1
+  fi
+  echo "[pre-commit] No secrets found in staged changes."
+fi
+
+exit 0

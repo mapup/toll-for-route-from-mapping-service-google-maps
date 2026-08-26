@@ -45,6 +45,11 @@ Each language folder is self-contained with its own README, source, and tests.
 git clone <repo-url>
 cd toll-for-route-from-mapping-service-google-maps
 
+# One-time per clone: wire the gitleaks pre-commit hook (installs gitleaks if
+# missing). Without it, git commit is not scanned for secrets. Re-run after
+# any fresh clone or new worktree - it is a no-op when already done.
+./hooks/install.sh
+
 # Set API keys (all languages read from env)
 export GMAPS_API_KEY="your-google-key"
 export TOLLGURU_API_KEY="your-tollguru-key"
